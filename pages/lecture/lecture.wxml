@@ -1,0 +1,37 @@
+<view class="container">
+  <view class="lecture-list">
+    <view class="lecture-item" wx:for="{{lectureList}}" wx:key="id" bindtap="onLectureTap" data-id="{{item.id}}">
+      <view class="lecture-header">
+        <view class="lecture-placeholder" style="background: linear-gradient(135deg, #1AAD19, #007AFF);">
+          <text class="placeholder-text">{{item.category.charAt(0)}}</text>
+        </view>
+        <view class="lecture-badge {{item.isFree ? 'free' : 'paid'}}">{{item.isFree ? '免费' : '收费'}}</view>
+      </view>
+      <view class="lecture-content">
+        <view class="lecture-title">{{item.title}}</view>
+        <view class="lecture-info">
+          <view class="info-row">
+            <text class="label">主讲人：</text>
+            <text class="value">{{item.speaker}}</text>
+          </view>
+          <view class="info-row">
+            <text class="label">时间：</text>
+            <text class="value">{{item.time}}</text>
+          </view>
+          <view class="info-row">
+            <text class="label">地点：</text>
+            <text class="value">{{item.location}}</text>
+          </view>
+          <view class="info-row">
+            <text class="label">主办方：</text>
+            <text class="value">{{item.organizer}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-tip" wx:if="{{lectureList.length === 0}}">
+    <text>暂无讲座信息</text>
+  </view>
+</view>

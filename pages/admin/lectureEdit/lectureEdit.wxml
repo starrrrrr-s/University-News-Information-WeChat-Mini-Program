@@ -1,0 +1,72 @@
+<view class="container">
+  <view class="form-section">
+    <view class="form-item">
+      <text class="form-label">讲座标题</text>
+      <input class="form-input" placeholder="请输入讲座标题" value="{{title}}" bindinput="onTitleInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">主讲人</text>
+      <input class="form-input" placeholder="请输入主讲人姓名" value="{{speaker}}" bindinput="onSpeakerInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">职称</text>
+      <input class="form-input" placeholder="请输入主讲人职称" value="{{speakerTitle}}" bindinput="onSpeakerTitleInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">时间</text>
+      <picker mode="date" value="{{date}}" bindchange="onDateChange">
+        <view class="form-picker">
+          <text>{{date || '请选择日期'}}</text>
+          <text class="picker-arrow">></text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">时间</text>
+      <picker mode="time" value="{{time}}" bindchange="onTimeChange">
+        <view class="form-picker">
+          <text>{{time || '请选择时间'}}</text>
+          <text class="picker-arrow">></text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">地点</text>
+      <input class="form-input" placeholder="请输入讲座地点" value="{{location}}" bindinput="onLocationInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">主办方</text>
+      <input class="form-input" placeholder="请输入主办方" value="{{organizer}}" bindinput="onOrganizerInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">类型</text>
+      <picker mode="selector" range="{{categoryList}}" bindchange="onCategoryChange">
+        <view class="form-picker">
+          <text>{{selectedCategoryIndex >= 0 ? categoryList[selectedCategoryIndex] : '请选择类型'}}</text>
+          <text class="picker-arrow">></text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">是否免费</text>
+      <switch checked="{{isFree}}" bindchange="onIsFreeChange" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">讲座内容</text>
+      <textarea class="form-textarea" placeholder="请输入讲座内容" value="{{content}}" bindinput="onContentInput" />
+    </view>
+  </view>
+
+  <view class="form-actions">
+    <button class="save-btn" bindtap="onSave">保存</button>
+  </view>
+</view>

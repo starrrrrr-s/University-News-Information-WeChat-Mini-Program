@@ -1,0 +1,49 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/news/news",
+    "pages/lecture/lecture",
+    "pages/personal/personal",
+    "pages/newsDetail/newsDetail",
+    "pages/lectureDetail/lectureDetail",
+    "pages/collections/collections",
+    "pages/admin/newsAdmin/newsAdmin",
+    "pages/admin/newsEdit/newsEdit",
+    "pages/admin/lectureAdmin/lectureAdmin",
+    "pages/admin/lectureEdit/lectureEdit",
+    "pages/admin/userAdmin/userAdmin"
+  ],
+  "window": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "高校新闻资讯",
+    "navigationBarBackgroundColor": "#1AAD19",
+    "backgroundColor": "#f8f8f8",
+    "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#1AAD19",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/news/news",
+        "text": "新闻"
+      },
+      {
+        "pagePath": "pages/lecture/lecture",
+        "text": "讲座"
+      },
+      {
+        "pagePath": "pages/personal/personal",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

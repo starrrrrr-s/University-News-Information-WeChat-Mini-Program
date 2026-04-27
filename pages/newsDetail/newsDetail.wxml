@@ -1,0 +1,44 @@
+<view class="container">
+  <view class="news-detail" wx:if="{{news}}">
+    <!-- 头部信息 -->
+    <view class="news-header">
+      <text class="category-tag" style="background-color: {{news.categoryColor}}">{{news.category}}</text>
+      <view class="news-title">{{news.title}}</view>
+      <view class="news-meta">
+        <text class="author">{{news.author}}</text>
+        <text class="separator">·</text>
+        <text class="date">{{news.date}}</text>
+        <text class="separator">·</text>
+        <text class="views">{{news.views}} 阅读</text>
+      </view>
+    </view>
+
+    <!-- 封面图 -->
+    <view class="news-cover">
+      <view class="news-placeholder" style="background: linear-gradient(135deg, {{news.categoryColor}}, #007AFF);">
+        <text class="placeholder-text">{{news.category.charAt(0)}}</text>
+      </view>
+    </view>
+
+    <!-- 正文 -->
+    <view class="news-content">
+      <text>{{news.content}}</text>
+    </view>
+
+    <!-- 底部操作栏 -->
+    <view class="action-bar">
+      <button class="action-btn {{isCollected ? 'collected' : ''}}" bindtap="onToggleCollect">
+        <text class="action-icon">{{isCollected ? '★' : '☆'}}</text>
+        <text class="action-text">{{isCollected ? '已收藏' : '收藏'}}</text>
+      </button>
+      <button class="action-btn share-btn" open-type="share">
+        <text class="action-icon">↗</text>
+        <text class="action-text">分享</text>
+      </button>
+    </view>
+  </view>
+
+  <view class="empty-tip" wx:if="{{!news}}">
+    <text>新闻不存在或已被删除</text>
+  </view>
+</view>

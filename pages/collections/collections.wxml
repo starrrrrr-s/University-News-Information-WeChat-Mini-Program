@@ -1,0 +1,36 @@
+<view class="container">
+  <view class="collection-header">
+    <text class="collection-title">我的收藏 ({{isLoggedIn ? collections.length : 0}})</text>
+  </view>
+
+  <!-- 未登录状态 -->
+  <view class="empty-tip" wx:if="{{!isLoggedIn}}">
+    <view class="empty-icon">🔒</view>
+    <text class="empty-text">请先登录</text>
+    <text class="empty-hint">登录后可查看您的收藏内容</text>
+    <button class="go-login-btn" bindtap="onGoLogin">去登录</button>
+  </view>
+
+  <!-- 已登录但无收藏 -->
+  <view class="empty-tip" wx:elif="{{collections.length === 0}}">
+    <view class="empty-icon">♡</view>
+    <text class="empty-text">暂无收藏内容</text>
+    <text class="empty-hint">在新闻详情页点击收藏按钮即可收藏</text>
+  </view>
+
+  <!-- 收藏列表 -->
+  <view class="news-list" wx:else>
+    <view class="news-item" wx:for="{{collections}}" wx:key="id" bindtap="onNewsTap" data-id="{{item.id}}">
+      <view class="news-content">
+        <view class="news-title">{{item.title}}</view>
+        <view class="news-meta">
+          <text class="category-tag" style="background-color: {{item.categoryColor}}">{{item.category}}</text>
+          <text class="news-date">{{item.date}}</text>
+        </view>
+      </view>
+      <view class="news-thumb-placeholder" style="background-color: {{item.categoryColor}};">
+        <text class="placeholder-text">{{item.category.charAt(0)}}</text>
+      </view>
+    </view>
+  </view>
+</view>

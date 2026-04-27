@@ -1,0 +1,29 @@
+<view class="container">
+  <view class="admin-header">
+    <text class="admin-title">用户管理</text>
+  </view>
+
+  <view class="user-list">
+    <view class="user-item" wx:for="{{userList}}" wx:key="id">
+      <view class="user-info">
+        <image class="user-avatar" src="{{item.avatarUrl}}" mode="aspectFill" />
+        <view class="user-detail">
+          <view class="user-name">{{item.nickName}}</view>
+          <view class="user-meta">
+            <text class="user-role {{item.isAdmin ? 'admin' : ''}}">{{item.isAdmin ? '管理员' : '普通用户'}}</text>
+            <text class="user-date">注册于 {{item.registerDate}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="user-actions">
+        <button class="action-btn {{item.isAdmin ? 'remove' : 'setAdmin'}}" bindtap="onToggleAdmin" data-id="{{item.id}}" data-isadmin="{{item.isAdmin}}">
+          {{item.isAdmin ? '取消管理员' : '设为管理员'}}
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-tip" wx:if="{{userList.length === 0}}">
+    <text>暂无用户</text>
+  </view>
+</view>

@@ -1,0 +1,47 @@
+<view class="container">
+  <view class="lecture-detail">
+    <view class="lecture-image-wrapper">
+      <view class="lecture-placeholder" style="background: linear-gradient(135deg, #1AAD19, #007AFF);">
+        <text class="placeholder-text">{{lecture.category.charAt(0)}}</text>
+      </view>
+      <view class="lecture-badge {{lecture.isFree ? 'free' : 'paid'}}">{{lecture.isFree ? '免费' : '收费'}}</view>
+    </view>
+
+    <view class="lecture-content">
+      <view class="lecture-title">{{lecture.title}}</view>
+
+      <view class="info-card">
+        <view class="info-row">
+          <text class="iconfont icon-speaker"></text>
+          <text class="label">主讲人：</text>
+          <text class="value">{{lecture.speaker}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">职称：</text>
+          <text class="value">{{lecture.speakerTitle}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">时间：</text>
+          <text class="value">{{lecture.time}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">地点：</text>
+          <text class="value">{{lecture.location}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">主办方：</text>
+          <text class="value">{{lecture.organizer}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">类型：</text>
+          <text class="value">{{lecture.category}}</text>
+        </view>
+      </view>
+
+      <view class="detail-section">
+        <view class="section-title">讲座内容</view>
+        <view class="detail-content">{{lecture.content}}</view>
+      </view>
+    </view>
+  </view>
+</view>

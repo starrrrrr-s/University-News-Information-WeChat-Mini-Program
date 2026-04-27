@@ -1,0 +1,27 @@
+<view class="container">
+  <view class="category-tabs">
+    <view class="tab-item {{currentCategory === 0 ? 'active' : ''}}" data-id="0" bindtap="onTabChange">全部</view>
+    <view class="tab-item {{currentCategory === item.id ? 'active' : ''}}" wx:for="{{categoryList}}" wx:key="id" data-id="{{item.id}}" bindtap="onTabChange">{{item.name}}</view>
+  </view>
+
+  <view class="news-list">
+    <view class="news-item" wx:for="{{newsList}}" wx:key="id" bindtap="onNewsTap" data-id="{{item.id}}">
+      <view class="news-content">
+        <view class="news-title">{{item.title}}</view>
+        <view class="news-summary">{{item.summary}}</view>
+        <view class="news-meta">
+          <text class="category-tag" style="background-color: {{item.categoryColor}}">{{item.category}}</text>
+          <text class="news-date">{{item.date}}</text>
+          <text class="news-views">{{item.views}} 阅读</text>
+        </view>
+      </view>
+      <view class="news-thumb-placeholder" style="background-color: #1AAD19;">
+          <text class="placeholder-text">{{item.category.charAt(0)}}</text>
+        </view>
+    </view>
+  </view>
+
+  <view class="empty-tip" wx:if="{{newsList.length === 0}}">
+    <text>暂无新闻</text>
+  </view>
+</view>
