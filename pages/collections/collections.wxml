@@ -30,11 +30,11 @@
     <!-- 编辑模式工具栏 -->
     <view class="edit-toolbar" wx:if="{{editMode}}">
       <view class="select-all-btn" bindtap="onSelectAll">
-        <view class="checkbox {{selectedIds.length > 0 && selectedIds.length === (activeTab === 0 ? newsCollections.length : lectureCollections.length) ? 'checked' : ''}}"></view>
+        <view class="checkbox {{isAllSelected ? 'checked' : ''}}"></view>
         <text>全选</text>
       </view>
-      <text class="selected-count">已选 {{selectedIds.length}} 项</text>
-      <view class="batch-delete-btn {{selectedIds.length > 0 ? 'active' : ''}}" bindtap="onBatchDelete">
+      <text class="selected-count">已选 {{selectedCount}} 项</text>
+      <view class="batch-delete-btn {{selectedCount > 0 ? 'active' : ''}}" bindtap="onBatchDelete">
         <text>取消收藏</text>
       </view>
     </view>
@@ -42,13 +42,17 @@
     <!-- 新闻收藏列表 -->
     <view wx:if="{{activeTab === 0}}">
       <view class="item-list" wx:if="{{newsCollections.length > 0}}">
-        <view class="collection-item {{editMode && selectedIds.indexOf(item.id) !== -1 ? 'selected' : ''}}"
-              wx:for="{{newsCollections}}" wx:key="id"
-              bindtap="{{editMode ? 'onToggleSelect' : 'onNewsTap'}}"
-              data-id="{{item.id}}">
+        <view
+          class="collection-item {{item.selected ? 'selected' : ''}}"
+          wx:for="{{newsCollections}}"
+          wx:key="id"
+          bindtap="onItemTap"
+          data-id="{{item.id}}"
+          data-type="news"
+        >
           <!-- 编辑模式复选框 -->
           <view class="checkbox-wrap" wx:if="{{editMode}}">
-            <view class="checkbox {{selectedIds.indexOf(item.id) !== -1 ? 'checked' : ''}}"></view>
+            <view class="checkbox {{item.selected ? 'checked' : ''}}"></view>
           </view>
           <!-- 内容 -->
           <view class="item-body">
@@ -79,12 +83,16 @@
     <!-- 讲座收藏列表 -->
     <view wx:if="{{activeTab === 1}}">
       <view class="item-list" wx:if="{{lectureCollections.length > 0}}">
-        <view class="collection-item {{editMode && selectedIds.indexOf(item.id) !== -1 ? 'selected' : ''}}"
-              wx:for="{{lectureCollections}}" wx:key="id"
-              bindtap="{{editMode ? 'onToggleSelect' : 'onLectureTap'}}"
-              data-id="{{item.id}}">
+        <view
+          class="collection-item {{item.selected ? 'selected' : ''}}"
+          wx:for="{{lectureCollections}}"
+          wx:key="id"
+          bindtap="onItemTap"
+          data-id="{{item.id}}"
+          data-type="lecture"
+        >
           <view class="checkbox-wrap" wx:if="{{editMode}}">
-            <view class="checkbox {{selectedIds.indexOf(item.id) !== -1 ? 'checked' : ''}}"></view>
+            <view class="checkbox {{item.selected ? 'checked' : ''}}"></view>
           </view>
           <view class="item-body">
             <view class="item-thumb lecture-thumb">

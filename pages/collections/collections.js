@@ -3,13 +3,13 @@ const app = getApp();
 
 Page({
   data: {
-    activeTab: 0,           // 0=新闻收藏 1=讲座收藏
+    activeTab: 0,
     newsCollections: [],
     lectureCollections: [],
     isLoggedIn: false,
-    // 批量编辑状态
     editMode: false,
-    selectedIds: []         // 当前 tab 下选中的 id 列表
+    selectedCount: 0,
+    isAllSelected: false
   },
 
   onLoad() {
@@ -22,7 +22,7 @@ Page({
 
   checkAndLoad() {
     const isLoggedIn = !!app.globalData.userInfo;
-    this.setData({ isLoggedIn, editMode: false, selectedIds: [] });
+    this.setData({ isLoggedIn, editMode: false });
     if (isLoggedIn) {
       this.loadNewsCollections();
       this.loadLectureCollections();
@@ -33,90 +33,143 @@ Page({
 
   loadNewsCollections() {
     const list = util.getCollections();
-    const withColor = list.map(item => ({
+    const withExtra = list.map(item => ({
       ...item,
-      categoryColor: util.getCategoryColor(item.categoryId)
+      categoryColor: util.getCategoryColor(item.categoryId),
+      selected: false
     }));
-    this.setData({ newsCollections: withColor });
+    this.setData({ newsCollections: withExtra });
+    this._updateSelectStats();
   },
 
   loadLectureCollections() {
     const list = util.getLectureCollections();
-    this.setData({ lectureCollections: list });
+    const withExtra = list.map(item => ({
+      ...item,
+      selected: false
+    }));
+    this.setData({ lectureCollections: withExtra });
+    this._updateSelectStats();
+  },
+
+  // 更新选中数量和全选状态
+  _updateSelectStats() {
+    const list = this.data.activeTab === 0
+      ? this.data.newsCollections
+      : this.data.lectureCollections;
+    const selectedCount = list.filter(item => item.selected).length;
+    const isAllSelected = list.length > 0 && selectedCount === list.length;
+    this.setData({ selectedCount, isAllSelected });
   },
 
   // ---- Tab ----
   onTabChange(e) {
+    const tab = parseInt(e.currentTarget.dataset.tab);
+    // 切换 tab 时清除选中状态
+    const newsList = this.data.newsCollections.map(i => ({ ...i, selected: false }));
+    const lectureList = this.data.lectureCollections.map(i => ({ ...i, selected: false }));
     this.setData({
-      activeTab: parseInt(e.currentTarget.dataset.tab),
+      activeTab: tab,
       editMode: false,
-      selectedIds: []
+      newsCollections: newsList,
+      lectureCollections: lectureList,
+      selectedCount: 0,
+      isAllSelected: false
     });
   },
 
   // ---- 编辑模式 ----
   onToggleEditMode() {
-    this.setData({ editMode: !this.data.editMode, selectedIds: [] });
+    const entering = !this.data.editMode;
+    if (!entering) {
+      // 退出编辑时清除所有选中
+      const newsList = this.data.newsCollections.map(i => ({ ...i, selected: false }));
+      const lectureList = this.data.lectureCollections.map(i => ({ ...i, selected: false }));
+      this.setData({
+        editMode: false,
+        newsCollections: newsList,
+        lectureCollections: lectureList,
+        selectedCount: 0,
+        isAllSelected: false
+      });
+    } else {
+      this.setData({ editMode: true, selectedCount: 0, isAllSelected: false });
+    }
   },
 
-  onToggleSelect(e) {
+  // 统一点击处理：编辑模式下切换选中，普通模式下跳转
+  onItemTap(e) {
     const id = parseInt(e.currentTarget.dataset.id);
-    let selected = [...this.data.selectedIds];
-    const idx = selected.indexOf(id);
-    if (idx === -1) {
-      selected.push(id);
-    } else {
-      selected.splice(idx, 1);
+    const type = e.currentTarget.dataset.type; // 'news' | 'lecture'
+
+    if (!this.data.editMode) {
+      // 普通模式：跳转详情
+      if (type === 'news') {
+        wx.navigateTo({ url: '/pages/newsDetail/newsDetail?id=' + id });
+      } else {
+        wx.navigateTo({ url: '/pages/lectureDetail/lectureDetail?id=' + id });
+      }
+      return;
     }
-    this.setData({ selectedIds: selected });
+
+    // 编辑模式：切换选中状态
+    if (type === 'news') {
+      const list = this.data.newsCollections.map(item =>
+        item.id === id ? { ...item, selected: !item.selected } : item
+      );
+      this.setData({ newsCollections: list }, () => this._updateSelectStats());
+    } else {
+      const list = this.data.lectureCollections.map(item =>
+        item.id === id ? { ...item, selected: !item.selected } : item
+      );
+      this.setData({ lectureCollections: list }, () => this._updateSelectStats());
+    }
   },
 
+  // 全选 / 取消全选
   onSelectAll() {
-    const list = this.data.activeTab === 0
-      ? this.data.newsCollections
-      : this.data.lectureCollections;
-    const allIds = list.map(item => item.id);
-    // 若已全选则反选（取消全选）
-    if (this.data.selectedIds.length === allIds.length) {
-      this.setData({ selectedIds: [] });
+    const shouldSelectAll = !this.data.isAllSelected;
+    if (this.data.activeTab === 0) {
+      const list = this.data.newsCollections.map(i => ({ ...i, selected: shouldSelectAll }));
+      this.setData({ newsCollections: list }, () => this._updateSelectStats());
     } else {
-      this.setData({ selectedIds: allIds });
+      const list = this.data.lectureCollections.map(i => ({ ...i, selected: shouldSelectAll }));
+      this.setData({ lectureCollections: list }, () => this._updateSelectStats());
     }
   },
 
+  // 批量删除
   onBatchDelete() {
-    const { selectedIds, activeTab } = this.data;
-    if (selectedIds.length === 0) {
-      wx.showToast({ title: '请先选择要删除的项目', icon: 'none' });
+    const { selectedCount, activeTab } = this.data;
+    if (selectedCount === 0) {
+      wx.showToast({ title: '请先选择要取消的项目', icon: 'none' });
       return;
     }
     wx.showModal({
       title: '批量取消收藏',
-      content: `确定取消收藏选中的 ${selectedIds.length} 项吗？`,
+      content: `确定取消收藏选中的 ${selectedCount} 项吗？`,
       confirmText: '确定',
       confirmColor: '#E64340',
       success: (res) => {
-        if (res.confirm) {
-          if (activeTab === 0) {
-            selectedIds.forEach(id => util.removeFromCollection(id));
-            this.loadNewsCollections();
-          } else {
-            selectedIds.forEach(id => util.removeLectureFromCollection(id));
-            this.loadLectureCollections();
-          }
-          this.setData({ selectedIds: [], editMode: false });
-          wx.showToast({ title: `已取消 ${selectedIds.length} 项收藏`, icon: 'success' });
+        if (!res.confirm) return;
+        if (activeTab === 0) {
+          this.data.newsCollections
+            .filter(i => i.selected)
+            .forEach(i => util.removeFromCollection(i.id));
+          this.loadNewsCollections();
+        } else {
+          this.data.lectureCollections
+            .filter(i => i.selected)
+            .forEach(i => util.removeLectureFromCollection(i.id));
+          this.loadLectureCollections();
         }
+        this.setData({ editMode: false, selectedCount: 0, isAllSelected: false });
+        wx.showToast({ title: `已取消 ${selectedCount} 项收藏`, icon: 'success' });
       }
     });
   },
 
-  // ---- 单项操作（非编辑模式） ----
-  onNewsTap(e) {
-    if (this.data.editMode) return; // 编辑模式下点击不跳转
-    wx.navigateTo({ url: '/pages/newsDetail/newsDetail?id=' + e.currentTarget.dataset.id });
-  },
-
+  // ---- 单项删除（非编辑模式右侧 ✕ 按钮） ----
   onDeleteNews(e) {
     const id = parseInt(e.currentTarget.dataset.id);
     wx.showModal({
@@ -132,11 +185,6 @@ Page({
         }
       }
     });
-  },
-
-  onLectureTap(e) {
-    if (this.data.editMode) return;
-    wx.navigateTo({ url: '/pages/lectureDetail/lectureDetail?id=' + e.currentTarget.dataset.id });
   },
 
   onDeleteLecture(e) {
