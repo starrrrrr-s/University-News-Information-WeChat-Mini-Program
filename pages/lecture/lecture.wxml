@@ -1,4 +1,10 @@
 <view class="container">
+  <!-- 刷新时间提示 -->
+  <view class="refresh-bar" wx:if="{{lastRefreshTime}}">
+    <text class="refresh-time">{{lastRefreshTime}} 更新</text>
+  </view>
+
+  <!-- 讲座列表 -->
   <view class="lecture-list">
     <view class="lecture-item" wx:for="{{lectureList}}" wx:key="id" bindtap="onLectureTap" data-id="{{item.id}}">
       <view class="lecture-header">
