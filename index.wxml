@@ -1,0 +1,41 @@
+<view class="container">
+  <!-- 轮播图 -->
+  <swiper class="banner-swiper" indicator-dots="true" autoplay="true" interval="3000" duration="500" circular="true">
+    <swiper-item wx:for="{{bannerList}}" wx:key="id" bindtap="onBannerTap" data-id="{{item.id}}">
+      <view class="banner-placeholder" style="background: linear-gradient(135deg, #1AAD19, #007AFF);">
+        <view class="banner-title">{{item.title}}</view>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <!-- 最新资讯 -->
+  <view class="latest-news">
+    <view class="section-header">
+      <text class="section-title">最新资讯</text>
+      <view class="header-right">
+        <text class="refresh-time" wx:if="{{lastRefreshTime}}">{{lastRefreshTime}} 更新</text>
+        <text class="more-link" bindtap="onMoreNews">更多 ›</text>
+      </view>
+    </view>
+
+    <view class="news-list">
+      <view class="news-item" wx:for="{{latestNews}}" wx:key="id" bindtap="onNewsTap" data-id="{{item.id}}">
+        <view class="news-content">
+          <view class="news-title">{{item.title}}</view>
+          <view class="news-meta">
+            <text class="category-tag" style="background-color: {{item.categoryColor}}">{{item.category}}</text>
+            <text class="news-date">{{item.date}}</text>
+          </view>
+        </view>
+        <view class="news-thumb-placeholder" style="background-color: {{item.categoryColor}};">
+          <text class="placeholder-text">{{item.category.charAt(0)}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 下拉刷新提示（刷新中时显示） -->
+    <view class="refresh-hint" wx:if="{{isRefreshing}}">
+      <text>正在加载最新资讯...</text>
+    </view>
+  </view>
+</view>
