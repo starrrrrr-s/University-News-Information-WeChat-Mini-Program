@@ -42,7 +42,7 @@ Page({
         const userInfo = {
           nickName: res.userInfo.nickName,
           avatarUrl: res.userInfo.avatarUrl,
-          isAdmin: false
+          isAdmin: true
         };
         app.globalData.userInfo = userInfo;
         app.globalData.isAdmin = false;
