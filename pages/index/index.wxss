@@ -39,9 +39,27 @@
   color: #333333;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.refresh-time {
+  font-size: 22rpx;
+  color: #bbbbbb;
+}
+
 .more-link {
   font-size: 26rpx;
   color: #1AAD19;
+}
+
+.refresh-hint {
+  text-align: center;
+  padding: 20rpx;
+  font-size: 24rpx;
+  color: #999999;
 }
 
 .news-item {
