@@ -37,7 +37,7 @@ Page({
   },
 
   onTabChange(e) {
-    const categoryId = e.currentTarget.dataset.id;
+    const categoryId = parseInt(e.currentTarget.dataset.id);
     this.setData({
       currentCategory: categoryId
     });
