@@ -1,40 +1,203 @@
-.collection-header {
-  padding: 30rpx;
+/* 顶部栏：Tab + 编辑按钮 */
+.top-bar {
+  display: flex;
+  align-items: stretch;
   background-color: #ffffff;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 1rpx solid #eeeeee;
 }
 
-.collection-title {
-  font-size: 32rpx;
+.tab-bar {
+  display: flex;
+  flex: 1;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  padding: 28rpx 0;
+  font-size: 28rpx;
+  color: #999999;
+  position: relative;
+}
+
+.tab-item.active {
+  color: #1AAD19;
   font-weight: bold;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 25%;
+  right: 25%;
+  height: 4rpx;
+  background-color: #1AAD19;
+  border-radius: 2rpx;
+}
+
+.tab-count {
+  background-color: #E64340;
+  color: #ffffff;
+  font-size: 20rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  border-radius: 16rpx;
+  text-align: center;
+  line-height: 32rpx;
+  padding: 0 6rpx;
+}
+
+.edit-btn {
+  display: flex;
+  align-items: center;
+  padding: 0 30rpx;
+  font-size: 28rpx;
+  color: #1AAD19;
+  border-left: 1rpx solid #eeeeee;
+}
+
+/* 编辑模式工具栏 */
+.edit-toolbar {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  background-color: #f8f8f8;
+  border-bottom: 1rpx solid #eeeeee;
+  gap: 20rpx;
+}
+
+.select-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 26rpx;
   color: #333333;
 }
 
-.news-list {
+.selected-count {
+  flex: 1;
+  font-size: 26rpx;
+  color: #999999;
+  text-align: center;
+}
+
+.batch-delete-btn {
+  font-size: 26rpx;
+  color: #cccccc;
+  padding: 10rpx 24rpx;
+  border-radius: 30rpx;
+  border: 1rpx solid #cccccc;
+}
+
+.batch-delete-btn.active {
+  color: #E64340;
+  border-color: #E64340;
+}
+
+/* 复选框 */
+.checkbox-wrap {
+  display: flex;
+  align-items: center;
+  padding: 0 20rpx 0 24rpx;
+  flex-shrink: 0;
+}
+
+.checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 20rpx;
+  border: 2rpx solid #cccccc;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+.checkbox.checked {
+  background-color: #1AAD19;
+  border-color: #1AAD19;
+  position: relative;
+}
+
+.checkbox.checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: 24rpx;
+  line-height: 1;
+}
+
+/* 列表 */
+.item-list {
   padding: 20rpx;
 }
 
-.news-item {
+.collection-item {
+  position: relative;
   display: flex;
   align-items: center;
   background-color: #ffffff;
   border-radius: 12rpx;
-  padding: 24rpx;
   margin-bottom: 20rpx;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: background-color 0.15s;
 }
 
-.news-content {
+.collection-item.selected {
+  background-color: #f0faf0;
+}
+
+.item-body {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  padding-right: 80rpx;
   flex: 1;
-  margin-right: 20rpx;
+  gap: 20rpx;
 }
 
-.news-title {
+/* 编辑模式下 item-body 不需要右侧留空 */
+.checkbox-wrap ~ .item-body {
+  padding-right: 24rpx;
+}
+
+.item-thumb {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lecture-thumb {
+  background: linear-gradient(135deg, #1AAD19, #007AFF);
+}
+
+.thumb-text {
+  color: #ffffff;
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.item-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.item-title {
   font-size: 30rpx;
   font-weight: bold;
   color: #333333;
   line-height: 1.4;
-  margin-bottom: 16rpx;
+  margin-bottom: 12rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -42,10 +205,12 @@
   -webkit-box-orient: vertical;
 }
 
-.news-meta {
+.item-meta {
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  gap: 12rpx;
+  margin-bottom: 8rpx;
+  flex-wrap: wrap;
 }
 
 .category-tag {
@@ -55,27 +220,49 @@
   border-radius: 4rpx;
 }
 
-.news-date {
+.lecture-tag {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+  color: #ffffff;
+}
+
+.lecture-tag.free { background-color: #1AAD19; }
+.lecture-tag.paid { background-color: #E64340; }
+
+.item-date {
   font-size: 24rpx;
   color: #999999;
 }
 
-.news-thumb-placeholder {
-  width: 160rpx;
-  height: 120rpx;
-  border-radius: 8rpx;
+.lecture-speaker {
+  font-size: 24rpx;
+  color: #999999;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 单项删除按钮 */
+.delete-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 72rpx;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  background-color: #E64340;
 }
 
-.placeholder-text {
+.delete-icon {
   color: #ffffff;
-  font-size: 48rpx;
+  font-size: 28rpx;
   font-weight: bold;
 }
 
+/* 空状态 */
 .empty-tip {
   display: flex;
   flex-direction: column;
@@ -84,7 +271,7 @@
 }
 
 .empty-icon {
-  font-size: 120rpx;
+  font-size: 100rpx;
   color: #dddddd;
   margin-bottom: 30rpx;
 }
