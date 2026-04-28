@@ -1,9 +1,16 @@
 <view class="container">
+  <!-- 分类 Tab -->
   <view class="category-tabs">
     <view class="tab-item {{currentCategory === 0 ? 'active' : ''}}" data-id="0" bindtap="onTabChange">全部</view>
     <view class="tab-item {{currentCategory === item.id ? 'active' : ''}}" wx:for="{{categoryList}}" wx:key="id" data-id="{{item.id}}" bindtap="onTabChange">{{item.name}}</view>
   </view>
 
+  <!-- 刷新时间提示 -->
+  <view class="refresh-bar" wx:if="{{lastRefreshTime}}">
+    <text class="refresh-time">{{lastRefreshTime}} 更新</text>
+  </view>
+
+  <!-- 新闻列表 -->
   <view class="news-list">
     <view class="news-item" wx:for="{{newsList}}" wx:key="id" bindtap="onNewsTap" data-id="{{item.id}}">
       <view class="news-content">
@@ -15,9 +22,9 @@
           <text class="news-views">{{item.views}} 阅读</text>
         </view>
       </view>
-      <view class="news-thumb-placeholder" style="background-color: #1AAD19;">
-          <text class="placeholder-text">{{item.category.charAt(0)}}</text>
-        </view>
+      <view class="news-thumb-placeholder" style="background-color: {{item.categoryColor}};">
+        <text class="placeholder-text">{{item.category.charAt(0)}}</text>
+      </view>
     </view>
   </view>
 
