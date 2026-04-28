@@ -1,0 +1,115 @@
+<view class="container">
+
+  <!-- 未登录状态 -->
+  <view class="empty-tip" wx:if="{{!isLoggedIn}}">
+    <view class="empty-icon">🔒</view>
+    <text class="empty-text">请先登录</text>
+    <text class="empty-hint">登录后可查看您的收藏内容</text>
+    <button class="go-login-btn" bindtap="onGoLogin">去登录</button>
+  </view>
+
+  <!-- 已登录 -->
+  <block wx:else>
+    <!-- Tab + 编辑按钮 -->
+    <view class="top-bar">
+      <view class="tab-bar">
+        <view class="tab-item {{activeTab === 0 ? 'active' : ''}}" bindtap="onTabChange" data-tab="0">
+          <text>新闻收藏</text>
+          <text class="tab-count" wx:if="{{newsCollections.length > 0}}">{{newsCollections.length}}</text>
+        </view>
+        <view class="tab-item {{activeTab === 1 ? 'active' : ''}}" bindtap="onTabChange" data-tab="1">
+          <text>讲座收藏</text>
+          <text class="tab-count" wx:if="{{lectureCollections.length > 0}}">{{lectureCollections.length}}</text>
+        </view>
+      </view>
+      <view class="edit-btn" bindtap="onToggleEditMode">
+        <text>{{editMode ? '完成' : '编辑'}}</text>
+      </view>
+    </view>
+
+    <!-- 编辑模式工具栏 -->
+    <view class="edit-toolbar" wx:if="{{editMode}}">
+      <view class="select-all-btn" bindtap="onSelectAll">
+        <view class="checkbox {{selectedIds.length > 0 && selectedIds.length === (activeTab === 0 ? newsCollections.length : lectureCollections.length) ? 'checked' : ''}}"></view>
+        <text>全选</text>
+      </view>
+      <text class="selected-count">已选 {{selectedIds.length}} 项</text>
+      <view class="batch-delete-btn {{selectedIds.length > 0 ? 'active' : ''}}" bindtap="onBatchDelete">
+        <text>取消收藏</text>
+      </view>
+    </view>
+
+    <!-- 新闻收藏列表 -->
+    <view wx:if="{{activeTab === 0}}">
+      <view class="item-list" wx:if="{{newsCollections.length > 0}}">
+        <view class="collection-item {{editMode && selectedIds.indexOf(item.id) !== -1 ? 'selected' : ''}}"
+              wx:for="{{newsCollections}}" wx:key="id"
+              bindtap="{{editMode ? 'onToggleSelect' : 'onNewsTap'}}"
+              data-id="{{item.id}}">
+          <!-- 编辑模式复选框 -->
+          <view class="checkbox-wrap" wx:if="{{editMode}}">
+            <view class="checkbox {{selectedIds.indexOf(item.id) !== -1 ? 'checked' : ''}}"></view>
+          </view>
+          <!-- 内容 -->
+          <view class="item-body">
+            <view class="item-thumb" style="background-color: {{item.categoryColor}};">
+              <text class="thumb-text">{{item.category.charAt(0)}}</text>
+            </view>
+            <view class="item-content">
+              <view class="item-title">{{item.title}}</view>
+              <view class="item-meta">
+                <text class="category-tag" style="background-color: {{item.categoryColor}}">{{item.category}}</text>
+                <text class="item-date">{{item.date}}</text>
+              </view>
+            </view>
+          </view>
+          <!-- 单项删除（非编辑模式） -->
+          <view class="delete-btn" wx:if="{{!editMode}}" catchtap="onDeleteNews" data-id="{{item.id}}">
+            <text class="delete-icon">✕</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty-tip" wx:else>
+        <view class="empty-icon">♡</view>
+        <text class="empty-text">暂无收藏的新闻</text>
+        <text class="empty-hint">在新闻详情页点击收藏按钮即可收藏</text>
+      </view>
+    </view>
+
+    <!-- 讲座收藏列表 -->
+    <view wx:if="{{activeTab === 1}}">
+      <view class="item-list" wx:if="{{lectureCollections.length > 0}}">
+        <view class="collection-item {{editMode && selectedIds.indexOf(item.id) !== -1 ? 'selected' : ''}}"
+              wx:for="{{lectureCollections}}" wx:key="id"
+              bindtap="{{editMode ? 'onToggleSelect' : 'onLectureTap'}}"
+              data-id="{{item.id}}">
+          <view class="checkbox-wrap" wx:if="{{editMode}}">
+            <view class="checkbox {{selectedIds.indexOf(item.id) !== -1 ? 'checked' : ''}}"></view>
+          </view>
+          <view class="item-body">
+            <view class="item-thumb lecture-thumb">
+              <text class="thumb-text">讲</text>
+            </view>
+            <view class="item-content">
+              <view class="item-title">{{item.title}}</view>
+              <view class="item-meta">
+                <text class="lecture-tag {{item.isFree ? 'free' : 'paid'}}">{{item.isFree ? '免费' : '收费'}}</text>
+                <text class="item-date">{{item.time}}</text>
+              </view>
+              <view class="lecture-speaker">{{item.speaker}} · {{item.location}}</view>
+            </view>
+          </view>
+          <view class="delete-btn" wx:if="{{!editMode}}" catchtap="onDeleteLecture" data-id="{{item.id}}">
+            <text class="delete-icon">✕</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty-tip" wx:else>
+        <view class="empty-icon">♡</view>
+        <text class="empty-text">暂无收藏的讲座</text>
+        <text class="empty-hint">在讲座详情页点击收藏按钮即可收藏</text>
+      </view>
+    </view>
+  </block>
+
+</view>
