@@ -109,7 +109,19 @@ Page({
     wx.navigateTo({ url: '/pages/admin/lectureAdmin/lectureAdmin' });
   },
 
+  onAdminComment() {
+    wx.navigateTo({ url: '/pages/admin/commentAdmin/commentAdmin' });
+  },
+
   onAdminUser() {
     wx.navigateTo({ url: '/pages/admin/userAdmin/userAdmin' });
+  },
+
+  onFontSetting() {
+    wx.navigateTo({ url: '/pages/fontSetting/fontSetting' });
+  },
+
+  onAbout() {
+    wx.navigateTo({ url: '/pages/about/about' });
   }
 });
