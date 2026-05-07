@@ -12,7 +12,7 @@ const mockData = {
       id: 1,
       title: '学校召开2026年春季学期工作会议',
       content: '3月1日，学校召开2026年春季学期工作会议，部署新学期重点工作。',
-      category: '学校要闻',
+      category: '立德树人',
       author: '校办',
       date: '2026-03-01',
       views: 1234
@@ -21,7 +21,7 @@ const mockData = {
       id: 2,
       title: '我校教师在国际学术会议上发表重要研究成果',
       content: '近日，我校教授在国际学术会议上发表了关于人工智能的最新研究成果。',
-      category: '学术动态',
+      category: '科技创新',
       author: '科研处',
       date: '2026-02-28',
       views: 890
@@ -39,11 +39,10 @@ const mockData = {
     }
   ],
   categories: [
-    { id: 1, name: '学校要闻' },
-    { id: 2, name: '学术动态' },
-    { id: 3, name: '教学园地' },
-    { id: 4, name: '校园文化' },
-    { id: 5, name: '人物风采' }
+    { id: 1, name: '立德树人' },
+    { id: 2, name: '科技创新' },
+    { id: 3, name: '学术动态' },
+    { id: 4, name: '媒体地大' }
   ]
 };
 
