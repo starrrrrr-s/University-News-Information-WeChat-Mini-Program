@@ -1,3 +1,4 @@
+const BASE_URL = 'http://localhost:3000';
 const STORAGE_KEY_USERS = 'user_list';
 
 const defaultUsers = [
@@ -12,7 +13,14 @@ const defaultUsers = [
 
 Page({
   data: {
-    userList: []
+    userList: [],
+
+    // 用户评论弹窗
+    showCommentModal: false,
+    currentUserId: null,
+    currentUserName: '',
+    userComments: [],
+    commentsLoading: false
   },
 
   onLoad() {
@@ -24,10 +32,8 @@ Page({
   },
 
   loadUsers() {
-    // 从 Storage 读取用户列表，合并当前登录用户
     let users = wx.getStorageSync(STORAGE_KEY_USERS) || defaultUsers;
 
-    // 将当前登录用户加入列表（如果不存在）
     const currentUser = wx.getStorageSync('userInfo');
     if (currentUser && currentUser.nickName) {
       const exists = users.some(u => u.nickName === currentUser.nickName);
@@ -68,5 +74,90 @@ Page({
         }
       }
     });
+  },
+
+  // ─── 查看用户评论 ────────────────────────────────────────────
+
+  onViewUserComments(e) {
+    const userId = e.currentTarget.dataset.id;
+    const userName = e.currentTarget.dataset.name;
+
+    this.setData({
+      showCommentModal: true,
+      currentUserId: userId,
+      currentUserName: userName,
+      userComments: [],
+      commentsLoading: true
+    });
+
+    const token = wx.getStorageSync('token');
+
+    wx.request({
+      url: `${BASE_URL}/api/admin/users/${userId}/comments`,
+      method: 'GET',
+      header: { 'Authorization': `Bearer ${token}` },
+      data: { page: 1, limit: 50 },
+      success: (res) => {
+        if (res.data && res.data.success) {
+          const comments = (res.data.data || []).map(c => ({
+            ...c,
+            createdAt: this.formatTime(c.createdAt)
+          }));
+          this.setData({ userComments: comments });
+        } else {
+          wx.showToast({ title: '加载失败', icon: 'none' });
+        }
+      },
+      fail: () => {
+        wx.showToast({ title: '网络错误，请检查后端服务', icon: 'none' });
+      },
+      complete: () => {
+        this.setData({ commentsLoading: false });
+      }
+    });
+  },
+
+  onCloseCommentModal() {
+    this.setData({ showCommentModal: false, userComments: [] });
+  },
+
+  onDeleteUserComment(e) {
+    const id = e.currentTarget.dataset.id;
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除该评论吗？',
+      confirmColor: '#E64340',
+      success: (res) => {
+        if (res.confirm) {
+          const token = wx.getStorageSync('token');
+          wx.request({
+            url: `${BASE_URL}/api/admin/comments/${id}`,
+            method: 'DELETE',
+            header: { 'Authorization': `Bearer ${token}` },
+            success: (res) => {
+              if (res.data && res.data.success) {
+                wx.showToast({ title: '删除成功', icon: 'success' });
+                const userComments = this.data.userComments.filter(c => c.id !== id);
+                this.setData({ userComments });
+              } else {
+                wx.showToast({ title: res.data.message || '删除失败', icon: 'none' });
+              }
+            },
+            fail: () => {
+              wx.showToast({ title: '网络错误', icon: 'none' });
+            }
+          });
+        }
+      }
+    });
+  },
+
+  formatTime(isoStr) {
+    if (!isoStr) return '';
+    const d = new Date(isoStr);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   }
 });
