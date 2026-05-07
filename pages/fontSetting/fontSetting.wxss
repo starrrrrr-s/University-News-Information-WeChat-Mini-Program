@@ -1,0 +1,134 @@
+/* 预览区域 */
+.preview-card {
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.preview-label {
+  font-size: 24rpx;
+  color: #999999;
+  margin-bottom: 16rpx;
+}
+
+.preview-text {
+  color: #333333;
+  line-height: 1.9;
+  transition: font-size 0.2s;
+}
+
+/* 设置卡片 */
+.setting-card {
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.setting-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+}
+
+.setting-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.font-size-label {
+  font-size: 26rpx;
+  color: #1AAD19;
+  font-weight: bold;
+}
+
+/* 滑块 */
+.slider-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.font-slider {
+  flex: 1;
+  margin: 0 16rpx;
+}
+
+.size-hint {
+  color: #999999;
+  flex-shrink: 0;
+}
+
+.small-hint {
+  font-size: 22rpx;
+}
+
+.large-hint {
+  font-size: 36rpx;
+}
+
+/* 快捷选项 */
+.quick-options {
+  display: flex;
+  gap: 16rpx;
+}
+
+.quick-btn {
+  flex: 1;
+  height: 80rpx;
+  background-color: #f5f5f5;
+  border-radius: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666666;
+  transition: all 0.2s;
+}
+
+.quick-btn.active {
+  background-color: #e8f5e9;
+  color: #1AAD19;
+  border: 2rpx solid #1AAD19;
+}
+
+/* 提示 */
+.tip-card {
+  background-color: #fffbf0;
+  border-radius: 12rpx;
+  padding: 24rpx 30rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+}
+
+.tip-icon {
+  font-size: 32rpx;
+  flex-shrink: 0;
+}
+
+.tip-text {
+  font-size: 24rpx;
+  color: #888888;
+  line-height: 1.7;
+}
+
+/* 恢复默认 */
+.reset-section {
+  padding: 10rpx 0 30rpx;
+}
+
+.reset-btn {
+  background-color: #ffffff;
+  color: #666666;
+  font-size: 28rpx;
+  padding: 24rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid #e0e0e0;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
