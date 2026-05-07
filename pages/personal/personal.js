@@ -1,6 +1,8 @@
 const app = getApp();
 const util = require('../../utils/util.js');
 
+const BASE_URL = 'http://localhost:3000';
+
 Page({
   data: {
     isLoggedIn: false,
@@ -38,22 +40,67 @@ Page({
   onLogin() {
     wx.getUserProfile({
       desc: '用于完善用户资料',
-      success: (res) => {
-        const userInfo = {
-          nickName: res.userInfo.nickName,
-          avatarUrl: res.userInfo.avatarUrl,
-          isAdmin: true
-        };
-        app.globalData.userInfo = userInfo;
-        app.globalData.isAdmin = false;
-        wx.setStorageSync('userInfo', userInfo);
-        this.setData({
-          isLoggedIn: true,
-          userInfo,
-          isAdmin: false,
-          collectionsCount: util.getCollections().length
+      success: (profileRes) => {
+        // 先获取微信登录 code
+        wx.login({
+          success: (loginRes) => {
+            if (!loginRes.code) {
+              wx.showToast({ title: '登录失败，请重试', icon: 'none' });
+              return;
+            }
+            // 调用后端登录接口，获取 JWT token
+            wx.request({
+              url: `${BASE_URL}/api/auth/login`,
+              method: 'POST',
+              data: { code: loginRes.code },
+              success: (authRes) => {
+                let token = '';
+                let isAdmin = false;
+                if (authRes.data && authRes.data.success) {
+                  token = authRes.data.data.token;
+                  isAdmin = authRes.data.data.user.is_admin || false;
+                  wx.setStorageSync('token', token);
+                }
+                const userInfo = {
+                  nickName: profileRes.userInfo.nickName,
+                  avatarUrl: profileRes.userInfo.avatarUrl,
+                  isAdmin
+                };
+                app.globalData.userInfo = userInfo;
+                app.globalData.isAdmin = isAdmin;
+                wx.setStorageSync('userInfo', userInfo);
+                this.setData({
+                  isLoggedIn: true,
+                  userInfo,
+                  isAdmin,
+                  collectionsCount: util.getCollections().length
+                });
+                wx.showToast({ title: '登录成功', icon: 'success' });
+              },
+              fail: () => {
+                // 后端不可用时，降级为本地登录（无法发评论等需认证的操作）
+                const userInfo = {
+                  nickName: profileRes.userInfo.nickName,
+                  avatarUrl: profileRes.userInfo.avatarUrl,
+                  isAdmin: false
+                };
+                app.globalData.userInfo = userInfo;
+                app.globalData.isAdmin = false;
+                wx.setStorageSync('userInfo', userInfo);
+                this.setData({
+                  isLoggedIn: true,
+                  userInfo,
+                  isAdmin: false,
+                  collectionsCount: util.getCollections().length
+                });
+                wx.showToast({ title: '登录成功', icon: 'success' });
+              }
+            });
+          },
+          fail: () => {
+            wx.showToast({ title: '登录失败，请重试', icon: 'none' });
+          }
         });
-        wx.showToast({ title: '登录成功', icon: 'success' });
       },
       fail: () => {
         wx.showToast({ title: '登录失败，请重试', icon: 'none' });
@@ -70,6 +117,7 @@ Page({
           app.globalData.userInfo = null;
           app.globalData.isAdmin = false;
           wx.removeStorageSync('userInfo');
+          wx.removeStorageSync('token');
           this.setData({
             isLoggedIn: false,
             userInfo: null,
