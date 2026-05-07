@@ -17,11 +17,10 @@ function formatTime(dateStr) {
 
 function getCategoryName(categoryId) {
   const categoryMap = {
-    1: '学校要闻',
-    2: '学术动态',
-    3: '教学园地',
-    4: '校园文化',
-    5: '人物风采'
+    1: '立德树人',
+    2: '科技创新',
+    3: '学术动态',
+    4: '媒体地大'
   };
   return categoryMap[categoryId] || '未分类';
 }
@@ -31,8 +30,7 @@ function getCategoryColor(categoryId) {
     1: '#1AAD19',
     2: '#0000FF',
     3: '#FFA500',
-    4: '#FF69B4',
-    5: '#9932CC'
+    4: '#FF69B4'
   };
   return colorMap[categoryId] || '#999999';
 }
