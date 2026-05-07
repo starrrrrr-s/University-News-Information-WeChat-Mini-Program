@@ -1,0 +1,79 @@
+<view class="container">
+  <!-- 预览区域 -->
+  <view class="preview-card">
+    <view class="preview-label">预览效果</view>
+    <view class="preview-text" style="font-size: {{fontSize}}rpx; line-height: 1.9;">
+      高校新闻资讯小程序为广大师生提供及时、准确的校园资讯服务。您可以在这里浏览最新的校园新闻、讲座信息，与同学交流互动。
+    </view>
+  </view>
+
+  <!-- 字体大小调节 -->
+  <view class="setting-card">
+    <view class="setting-header">
+      <text class="setting-title">字体大小</text>
+      <text class="font-size-label">{{fontSizeLabel}}</text>
+    </view>
+
+    <!-- 滑块 -->
+    <view class="slider-wrapper">
+      <text class="size-hint small-hint">小</text>
+      <slider
+        class="font-slider"
+        min="{{minSize}}"
+        max="{{maxSize}}"
+        step="2"
+        value="{{fontSize}}"
+        activeColor="#1AAD19"
+        backgroundColor="#e0e0e0"
+        block-color="#1AAD19"
+        block-size="24"
+        bindchange="onSliderChange"
+        bindchanging="onSliderChanging"
+      />
+      <text class="size-hint large-hint">大</text>
+    </view>
+
+    <!-- 快捷选项 -->
+    <view class="quick-options">
+      <view
+        class="quick-btn {{fontSize === 24 ? 'active' : ''}}"
+        bindtap="onQuickSelect"
+        data-size="24"
+      >
+        <text style="font-size: 22rpx;">小</text>
+      </view>
+      <view
+        class="quick-btn {{fontSize === 28 ? 'active' : ''}}"
+        bindtap="onQuickSelect"
+        data-size="28"
+      >
+        <text style="font-size: 26rpx;">标准</text>
+      </view>
+      <view
+        class="quick-btn {{fontSize === 32 ? 'active' : ''}}"
+        bindtap="onQuickSelect"
+        data-size="32"
+      >
+        <text style="font-size: 30rpx;">大</text>
+      </view>
+      <view
+        class="quick-btn {{fontSize === 38 ? 'active' : ''}}"
+        bindtap="onQuickSelect"
+        data-size="38"
+      >
+        <text style="font-size: 34rpx;">超大</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 说明 -->
+  <view class="tip-card">
+    <text class="tip-icon">💡</text>
+    <text class="tip-text">字体大小设置将应用于新闻和讲座的正文内容，设置后立即生效并自动保存。</text>
+  </view>
+
+  <!-- 恢复默认 -->
+  <view class="reset-section">
+    <button class="reset-btn" bindtap="onReset">恢复默认大小</button>
+  </view>
+</view>
