@@ -22,7 +22,55 @@
 
     <!-- 正文 -->
     <view class="news-content">
-      <text>{{news.content}}</text>
+      <text style="font-size: {{fontSize}}rpx; line-height: 1.9;">{{news.content}}</text>
+    </view>
+
+    <!-- 评论区 -->
+    <view class="comment-section">
+      <view class="comment-header">
+        <text class="comment-title">评论 ({{commentTotal}})</text>
+      </view>
+
+      <!-- 评论列表 -->
+      <view class="comment-list" wx:if="{{commentList.length > 0}}">
+        <view class="comment-item" wx:for="{{commentList}}" wx:key="id">
+          <!-- 置顶标识 -->
+          <view class="top-badge" wx:if="{{item.is_top}}">置顶</view>
+
+          <view class="comment-main">
+            <!-- 用户头像 -->
+            <view class="comment-avatar">
+              <image wx:if="{{item.user && item.user.avatar_url}}" src="{{item.user.avatar_url}}" mode="aspectFill" class="avatar-img" />
+              <view wx:else class="avatar-placeholder-small">
+                <text>{{item.user ? item.user.nickname.charAt(0) : '?'}}</text>
+              </view>
+            </view>
+
+            <view class="comment-body">
+              <view class="comment-user-name">{{item.user ? item.user.nickname : '匿名用户'}}</view>
+              <!-- 回复标识 -->
+              <view class="reply-to" wx:if="{{item.parent_id}}">
+                <text class="reply-label">回复</text>
+              </view>
+              <view class="comment-content">{{item.content}}</view>
+              <view class="comment-footer">
+                <text class="comment-time">{{item.createdAt}}</text>
+                <text class="reply-btn" bindtap="onReply" data-id="{{item.id}}" data-nickname="{{item.user ? item.user.nickname : '匿名用户'}}">回复</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 空评论提示 -->
+      <view class="comment-empty" wx:if="{{commentList.length === 0 && !commentLoading}}">
+        <text>暂无评论，快来发表第一条评论吧～</text>
+      </view>
+
+      <!-- 加载更多 -->
+      <view class="load-more" wx:if="{{hasMoreComments}}" bindtap="loadMoreComments">
+        <text>加载更多评论</text>
+      </view>
     </view>
 
     <!-- 底部操作栏 -->
@@ -30,6 +78,10 @@
       <button class="action-btn {{isCollected ? 'collected' : ''}}" bindtap="onToggleCollect">
         <text class="action-icon">{{isCollected ? '★' : '☆'}}</text>
         <text class="action-text">{{isCollected ? '已收藏' : '收藏'}}</text>
+      </button>
+      <button class="action-btn comment-btn" bindtap="onFocusComment">
+        <text class="action-icon">💬</text>
+        <text class="action-text">评论</text>
       </button>
       <button class="action-btn share-btn" open-type="share">
         <text class="action-icon">↗</text>
@@ -40,5 +92,26 @@
 
   <view class="empty-tip" wx:if="{{!news}}">
     <text>新闻不存在或已被删除</text>
+  </view>
+
+  <!-- 评论输入框（固定在底部，点击评论按钮时显示） -->
+  <view class="comment-input-mask" wx:if="{{showCommentInput}}" bindtap="onHideCommentInput"></view>
+  <view class="comment-input-bar" wx:if="{{showCommentInput}}">
+    <view class="reply-hint" wx:if="{{replyTo}}">
+      <text>回复 @{{replyTo.nickname}}</text>
+      <text class="cancel-reply" bindtap="onCancelReply">取消回复</text>
+    </view>
+    <view class="input-row">
+      <input
+        class="comment-input"
+        value="{{commentContent}}"
+        bindinput="onCommentInput"
+        placeholder="{{replyTo ? '回复 @' + replyTo.nickname : '说点什么吧...'}}"
+        maxlength="500"
+        focus="{{commentInputFocus}}"
+        adjust-position="{{true}}"
+      />
+      <button class="send-btn" bindtap="onSubmitComment" disabled="{{commentContent.length === 0}}">发送</button>
+    </view>
   </view>
 </view>
