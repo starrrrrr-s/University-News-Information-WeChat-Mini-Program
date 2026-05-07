@@ -11,6 +11,7 @@ App({
       this.globalData.userInfo = userInfo;
       this.globalData.isAdmin = userInfo.isAdmin || false;
     }
+    // token 已存储在 storage 中，wx.request 时直接读取即可
   },
 
   /**
