@@ -58,15 +58,17 @@ const syncDatabase = async () => {
 
     // 初始化分类数据
     const categories = [
-      { name: '学校要闻' },
-      { name: '学术动态' },
-      { name: '教学园地' },
-      { name: '校园文化' },
-      { name: '人物风采' }
+      { id: 1, name: '立德树人' },
+      { id: 2, name: '科技创新' },
+      { id: 3, name: '学术动态' },
+      { id: 4, name: '媒体地大' }
     ];
 
     for (const category of categories) {
-      await Category.findOrCreate({ where: { name: category.name } });
+      await Category.upsert({
+        id: category.id,
+        name: category.name
+      });
     }
 
     console.log('初始化分类数据成功');
