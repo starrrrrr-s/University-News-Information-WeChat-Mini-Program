@@ -1,0 +1,108 @@
+<view class="container">
+  <!-- 顶部 Logo 区域 -->
+  <view class="hero-section">
+    <view class="logo-wrapper">
+      <text class="logo-icon">🎓</text>
+    </view>
+    <view class="app-name">高校新闻资讯</view>
+    <view class="app-version">版本 v1.0.0</view>
+  </view>
+
+  <!-- 简介 -->
+  <view class="card">
+    <view class="card-title">关于本小程序</view>
+    <view class="card-content">
+      高校新闻资讯小程序是一款专为高校师生打造的校园资讯平台，致力于为广大师生提供及时、准确、全面的校园新闻与讲座信息服务。
+    </view>
+    <view class="card-content">
+      无论是学校要闻、学术动态、教学园地，还是校园文化、人物风采，都能在这里第一时间获取。同时，平台还提供丰富的讲座资讯，帮助师生把握每一次学习与交流的机会。
+    </view>
+  </view>
+
+  <!-- 主要功能 -->
+  <view class="card">
+    <view class="card-title">主要功能</view>
+    <view class="feature-list">
+      <view class="feature-item">
+        <text class="feature-icon">📰</text>
+        <view class="feature-info">
+          <view class="feature-name">校园新闻</view>
+          <view class="feature-desc">多分类新闻资讯，支持收藏与分享</view>
+        </view>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">🎤</text>
+        <view class="feature-info">
+          <view class="feature-name">讲座资讯</view>
+          <view class="feature-desc">实时讲座信息，分享听讲心得</view>
+        </view>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">💬</text>
+        <view class="feature-info">
+          <view class="feature-name">互动评论</view>
+          <view class="feature-desc">发表评论、回复讨论，促进交流</view>
+        </view>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">⭐</text>
+        <view class="feature-info">
+          <view class="feature-name">收藏管理</view>
+          <view class="feature-desc">收藏感兴趣的内容，随时查阅</view>
+        </view>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">🔤</text>
+        <view class="feature-info">
+          <view class="feature-name">字体调节</view>
+          <view class="feature-desc">自定义字体大小，舒适阅读</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 主创团队 -->
+  <view class="card">
+    <view class="card-title">主创团队</view>
+    <view class="team-intro">
+      本小程序由软件工程综合实践课程团队开发，团队成员来自计算机相关专业，致力于用技术服务校园生活。
+    </view>
+    <view class="team-list">
+      <view class="team-item">
+        <text class="team-role">产品设计</text>
+        <text class="team-name">团队成员</text>
+      </view>
+      <view class="team-item">
+        <text class="team-role">前端开发</text>
+        <text class="team-name">团队成员</text>
+      </view>
+      <view class="team-item">
+        <text class="team-role">后端开发</text>
+        <text class="team-name">团队成员</text>
+      </view>
+      <view class="team-item">
+        <text class="team-role">测试运维</text>
+        <text class="team-name">团队成员</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 联系我们 -->
+  <view class="card">
+    <view class="card-title">联系我们</view>
+    <view class="contact-item">
+      <text class="contact-label">意见反馈</text>
+      <text class="contact-value">欢迎通过小程序内反馈功能提交</text>
+    </view>
+    <view class="contact-item">
+      <text class="contact-label">开发单位</text>
+      <text class="contact-value">软件工程综合实践课程组</text>
+    </view>
+  </view>
+
+  <!-- 版权信息 -->
+  <view class="copyright">
+    <text>© 2024 高校新闻资讯团队</text>
+    <text>保留所有权利</text>
+  </view>
+</view>
