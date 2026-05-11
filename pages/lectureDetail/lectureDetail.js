@@ -35,6 +35,10 @@ Page({
   onShow() {
     const fontSize = wx.getStorageSync('fontSize') || 28;
     this.setData({ fontSize });
+    // 每次页面显示时重新加载评论，确保评论列表是最新的
+    if (this.data.lecture) {
+      this.loadComments(true);
+    }
   },
 
   loadLecture(id) {
@@ -85,7 +89,22 @@ Page({
         }
       },
       fail: () => {
-        // 后端未启动时静默失败
+        // 后端未启动时，从本地 Storage 读取持久化的评论
+        const lectureId = this.data.lecture.id;
+        const storageKey = `local_comments_lecture_${lectureId}`;
+        const localComments = wx.getStorageSync(storageKey) || [];
+        const formatted = localComments.map(c => ({
+          ...c,
+          createdAt: this.formatTime(c.createdAt)
+        }));
+        if (reset) {
+          this.setData({
+            commentList: formatted,
+            commentTotal: formatted.length,
+            commentPage: 2,
+            hasMoreComments: false
+          });
+        }
       },
       complete: () => {
         this.setData({ commentLoading: false });
@@ -192,21 +211,33 @@ Page({
         }
       },
       fail: () => {
-        // 后端未启动时本地模拟
+        // 后端未启动时，本地模拟添加评论并持久化到 Storage
+        const lectureId = this.data.lecture.id;
+        const storageKey = `local_comments_lecture_${lectureId}`;
         const mockComment = {
           id: Date.now(),
           content,
           parent_id: this.data.replyTo ? this.data.replyTo.id : null,
           is_top: 0,
-          createdAt: this.formatTime(new Date().toISOString()),
+          createdAt: new Date().toISOString(),
           user: {
             id: 0,
             nickname: userInfo.nickName || '我',
             avatar_url: userInfo.avatarUrl || ''
           }
         };
+        // 持久化到本地 Storage
+        const localComments = wx.getStorageSync(storageKey) || [];
+        localComments.unshift(mockComment);
+        wx.setStorageSync(storageKey, localComments);
+
+        const formatted = {
+          ...mockComment,
+          createdAt: this.formatTime(mockComment.createdAt)
+        };
+        const commentList = [formatted, ...this.data.commentList];
         this.setData({
-          commentList: [mockComment, ...this.data.commentList],
+          commentList,
           commentTotal: this.data.commentTotal + 1,
           commentContent: '',
           showCommentInput: false,
