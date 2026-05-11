@@ -117,9 +117,10 @@ Page({
       success: (res) => {
         if (res.data && res.data.success) {
           wx.showToast({ title: `${action}成功`, icon: 'success' });
-          // 更新本地列表
+          // 更新本地列表（统一转为数字比较）
+          const numId = parseInt(id);
           const commentList = this.data.commentList.map(c => {
-            if (c.id === id) return { ...c, status };
+            if (c.id === numId) return { ...c, status };
             return c;
           });
           this.setData({ commentList });
@@ -150,8 +151,9 @@ Page({
       success: (res) => {
         if (res.data && res.data.success) {
           wx.showToast({ title: isTop ? '置顶成功' : '已取消置顶', icon: 'success' });
+          const numId = parseInt(id);
           const commentList = this.data.commentList.map(c => {
-            if (c.id === id) return { ...c, is_top: isTop };
+            if (c.id === numId) return { ...c, is_top: isTop };
             return c;
           });
           this.setData({ commentList });
@@ -182,7 +184,8 @@ Page({
             success: (res) => {
               if (res.data && res.data.success) {
                 wx.showToast({ title: '删除成功', icon: 'success' });
-                const commentList = this.data.commentList.filter(c => c.id !== id);
+                const numId = parseInt(id);
+                const commentList = this.data.commentList.filter(c => c.id !== numId);
                 this.setData({ commentList });
               } else {
                 wx.showToast({ title: res.data.message || '删除失败', icon: 'none' });
