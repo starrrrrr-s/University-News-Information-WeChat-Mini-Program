@@ -161,12 +161,20 @@ Page({
     wx.navigateTo({ url: '/pages/admin/commentAdmin/commentAdmin' });
   },
 
+  onAdminFeedback() {
+    wx.navigateTo({ url: '/pages/admin/feedbackAdmin/feedbackAdmin' });
+  },
+
   onAdminUser() {
     wx.navigateTo({ url: '/pages/admin/userAdmin/userAdmin' });
   },
 
   onFontSetting() {
     wx.navigateTo({ url: '/pages/fontSetting/fontSetting' });
+  },
+
+  onFeedback() {
+    wx.navigateTo({ url: '/pages/feedback/feedback' });
   },
 
   onAbout() {

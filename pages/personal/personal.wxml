@@ -32,6 +32,11 @@
       <text class="menu-text">字体设置</text>
       <text class="menu-arrow">›</text>
     </view>
+    <view class="menu-item" bindtap="onFeedback">
+      <text class="menu-icon">💬</text>
+      <text class="menu-text">意见反馈</text>
+      <text class="menu-arrow">›</text>
+    </view>
     <view class="menu-item" bindtap="onAbout">
       <text class="menu-icon">ℹ</text>
       <text class="menu-text">关于我们</text>
@@ -55,6 +60,11 @@
     <view class="menu-item" bindtap="onAdminComment">
       <text class="menu-icon admin-icon">💬</text>
       <text class="menu-text">评论管理</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="onAdminFeedback">
+      <text class="menu-icon admin-icon">📝</text>
+      <text class="menu-text">反馈管理</text>
       <text class="menu-arrow">›</text>
     </view>
     <view class="menu-item" bindtap="onAdminUser">
