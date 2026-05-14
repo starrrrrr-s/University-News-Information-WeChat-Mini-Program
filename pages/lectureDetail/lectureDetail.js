@@ -265,11 +265,95 @@ Page({
     return `${y}-${m}-${day}`;
   },
 
+  // ─── 分享功能 ────────────────────────────────────────────────
+
+  /**
+   * 格式化讲座时间用于分享
+   * @param {string|Date} time 讲座时间
+   * @returns {string} 格式化后的时间字符串
+   */
+  formatLectureTime(time) {
+    if (!time) return '';
+    const d = new Date(time);
+    const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hour = String(d.getHours()).padStart(2, '0');
+    const minute = String(d.getMinutes()).padStart(2, '0');
+    const weekDay = weekDays[d.getDay()];
+    return `${m}月${day}日(${weekDay}) ${hour}:${minute}`;
+  },
+
+  /**
+   * 分享给好友
+   * 分享卡片显示完整的讲座信息：标题 + 时间 + 地点 + 主讲人
+   * 方便接收者无需打开小程序就能判断是否参加
+   */
   onShareAppMessage() {
     const lecture = this.data.lecture;
+    if (!lecture) {
+      return {
+        title: '高校讲座资讯',
+        path: '/pages/index/index'
+      };
+    }
+
+    // 构建分享标题，包含时间地点等关键信息
+    // 格式：【讲座】标题 | 时间 | 地点
+    const timeStr = this.formatLectureTime(lecture.time);
+    const location = lecture.location || '';
+    
+    let shareTitle = `【讲座】${lecture.title}`;
+    if (timeStr) {
+      shareTitle += ` | ${timeStr}`;
+    }
+    if (location) {
+      shareTitle += ` | ${location}`;
+    }
+    if (lecture.speaker) {
+      shareTitle += ` | 主讲：${lecture.speaker}`;
+    }
+
     return {
-      title: lecture ? lecture.title : '高校讲座资讯',
-      path: lecture ? '/pages/lectureDetail/lectureDetail?id=' + lecture.id : '/pages/index/index'
+      title: shareTitle,
+      path: `/pages/lectureDetail/lectureDetail?id=${lecture.id}`,
+      imageUrl: lecture.image || ''
+    };
+  },
+
+  /**
+   * 分享到朋友圈
+   * 用户可以将讲座分享到朋友圈，邀请更多人参加
+   */
+  onShareTimeline() {
+    const lecture = this.data.lecture;
+    if (!lecture) {
+      return {
+        title: '高校讲座资讯',
+        query: ''
+      };
+    }
+
+    // 构建分享标题，包含时间地点信息
+    const timeStr = this.formatLectureTime(lecture.time);
+    const location = lecture.location || '';
+    
+    let shareTitle = `【讲座】${lecture.title}`;
+    if (timeStr) {
+      shareTitle += `\n时间：${timeStr}`;
+    }
+    if (location) {
+      shareTitle += `\n地点：${location}`;
+    }
+    if (lecture.speaker) {
+      shareTitle += `\n主讲：${lecture.speaker}`;
+    }
+
+    return {
+      title: shareTitle,
+      query: `id=${lecture.id}`,
+      imageUrl: lecture.image || ''
     };
   }
 });
