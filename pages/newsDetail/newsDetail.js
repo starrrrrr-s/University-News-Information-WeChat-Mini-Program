@@ -354,12 +354,57 @@ Page({
     return `${y}-${m}-${day}`;
   },
 
-  // 微信分享
+  // ─── 分享功能 ────────────────────────────────────────────────
+
+  /**
+   * 分享给好友
+   * 分享卡片显示：标题 + 摘要信息
+   */
   onShareAppMessage() {
     const news = this.data.news;
+    if (!news) {
+      return {
+        title: '高校新闻资讯',
+        path: '/pages/index/index'
+      };
+    }
+
+    // 构建分享标题，包含关键信息
+    let shareTitle = news.title;
+    if (news.category) {
+      shareTitle = `【${news.category}】${news.title}`;
+    }
+
     return {
-      title: news ? news.title : '高校新闻资讯',
-      path: news ? '/pages/newsDetail/newsDetail?id=' + news.id : '/pages/index/index'
+      title: shareTitle,
+      path: `/pages/newsDetail/newsDetail?id=${news.id}`,
+      imageUrl: news.image || '' // 如果有封面图则使用
+    };
+  },
+
+  /**
+   * 分享到朋友圈
+   * 用户可以将新闻分享到朋友圈，让更多人看到
+   */
+  onShareTimeline() {
+    const news = this.data.news;
+    if (!news) {
+      return {
+        title: '高校新闻资讯',
+        query: ''
+      };
+    }
+
+    // 构建分享标题，包含分类和标题
+    let shareTitle = news.title;
+    if (news.category) {
+      shareTitle = `【${news.category}】${news.title}`;
+    }
+
+    return {
+      title: shareTitle,
+      query: `id=${news.id}`,
+      imageUrl: news.image || '' // 如果有封面图则使用
     };
   }
 });
