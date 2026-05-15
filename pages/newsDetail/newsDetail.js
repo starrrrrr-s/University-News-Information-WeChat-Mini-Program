@@ -1,18 +1,15 @@
-const data = require('../../utils/data.js');
 const util = require('../../utils/util.js');
 const app = getApp();
 
-// 后端 API 基础地址（与后端 app.js 中的 PORT 一致）
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://localhost:3001';
 
 Page({
   data: {
     news: null,
     isCollected: false,
     isLoggedIn: false,
-    fontSize: 30,  // 默认字体大小（rpx），从全局设置读取
+    fontSize: 30,
 
-    // 评论相关
     commentList: [],
     commentTotal: 0,
     commentPage: 1,
@@ -20,20 +17,18 @@ Page({
     hasMoreComments: false,
     commentLoading: false,
 
-    // 评论输入框
     showCommentInput: false,
     commentInputFocus: false,
     commentContent: '',
-    replyTo: null  // { id, nickname } 回复目标
+    replyTo: null
   },
 
   onLoad(options) {
-    // 读取字体大小设置
     const fontSize = wx.getStorageSync('fontSize') || 30;
     this.setData({ fontSize });
 
     if (options.id) {
-      this.loadNews(parseInt(options.id));
+      this.loadNews(options.id);
     }
   },
 
@@ -42,29 +37,40 @@ Page({
     this.setData({ isLoggedIn: !!userInfo });
     if (this.data.news) {
       this.checkCollectStatus(this.data.news.id);
-      // 每次页面显示时重新加载评论，确保评论列表是最新的
       this.loadComments(true);
     }
-    // 刷新字体大小
     const fontSize = wx.getStorageSync('fontSize') || 30;
     this.setData({ fontSize });
   },
 
   loadNews(id) {
-    const news = data.getNewsById(id);
-    if (news) {
-      const newsWithColor = {
-        ...news,
-        categoryColor: util.getCategoryColor(news.categoryId)
-      };
-      this.setData({ news: newsWithColor });
-      this.checkCollectStatus(news.id);
-      wx.setNavigationBarTitle({ title: news.title });
-      // 加载评论
-      this.loadComments(true);
-    } else {
-      wx.showToast({ title: '新闻不存在', icon: 'none' });
-    }
+    wx.showLoading({ title: '加载中...' });
+    
+    wx.request({
+      url: `${BASE_URL}/api/news/${id}`,
+      method: 'GET',
+      success: (res) => {
+        if (res.data && res.data.success) {
+          const news = res.data.data;
+          const newsWithColor = {
+            ...news,
+            categoryColor: util.getCategoryColor(news.categoryId)
+          };
+          this.setData({ news: newsWithColor });
+          this.checkCollectStatus(news.id);
+          wx.setNavigationBarTitle({ title: news.title });
+          this.loadComments(true);
+        } else {
+          wx.showToast({ title: '新闻不存在', icon: 'none' });
+        }
+      },
+      fail: () => {
+        wx.showToast({ title: '获取新闻失败', icon: 'none' });
+      },
+      complete: () => {
+        wx.hideLoading();
+      }
+    });
   },
 
   checkCollectStatus(newsId) {
@@ -115,12 +121,6 @@ Page({
     }
   },
 
-  // ─── 评论功能 ────────────────────────────────────────────────
-
-  /**
-   * 加载评论列表
-   * @param {boolean} reset 是否重置（第一页）
-   */
   loadComments(reset = false) {
     const news = this.data.news;
     if (!news) return;
@@ -143,7 +143,6 @@ Page({
       success: (res) => {
         if (res.data && res.data.success) {
           const newComments = res.data.data || [];
-          // 格式化时间
           const formatted = newComments.map(c => ({
             ...c,
             createdAt: this.formatTime(c.createdAt)
@@ -162,7 +161,6 @@ Page({
         }
       },
       fail: () => {
-        // 后端未启动时，从本地 Storage 读取持久化的评论
         const newsId = this.data.news.id;
         const storageKey = `local_comments_news_${newsId}`;
         const localComments = wx.getStorageSync(storageKey) || [];
@@ -189,7 +187,6 @@ Page({
     this.loadComments(false);
   },
 
-  /** 点击底部评论按钮，显示输入框 */
   onFocusComment() {
     if (!app.globalData.userInfo) {
       wx.showModal({
@@ -210,7 +207,6 @@ Page({
     });
   },
 
-  /** 点击回复按钮 */
   onReply(e) {
     if (!app.globalData.userInfo) {
       wx.showModal({
@@ -249,7 +245,6 @@ Page({
     this.setData({ commentContent: e.detail.value });
   },
 
-  /** 提交评论 */
   onSubmitComment() {
     const content = this.data.commentContent.trim();
     if (!content) {
@@ -292,14 +287,12 @@ Page({
             showCommentInput: false,
             replyTo: null
           });
-          // 重新加载评论
           this.loadComments(true);
         } else {
           wx.showToast({ title: res.data.message || '评论失败', icon: 'none' });
         }
       },
       fail: () => {
-        // 后端未启动时，本地模拟添加评论并持久化到 Storage
         const newsId = this.data.news.id;
         const storageKey = `local_comments_news_${newsId}`;
         const mockComment = {
@@ -314,7 +307,6 @@ Page({
             avatar_url: userInfo.avatarUrl || ''
           }
         };
-        // 持久化到本地 Storage
         const localComments = wx.getStorageSync(storageKey) || [];
         localComments.unshift(mockComment);
         wx.setStorageSync(storageKey, localComments);
@@ -339,7 +331,6 @@ Page({
     });
   },
 
-  /** 格式化时间 */
   formatTime(isoStr) {
     if (!isoStr) return '';
     const d = new Date(isoStr);
@@ -354,12 +345,6 @@ Page({
     return `${y}-${m}-${day}`;
   },
 
-  // ─── 分享功能 ────────────────────────────────────────────────
-
-  /**
-   * 分享给好友
-   * 分享卡片显示：标题 + 摘要信息
-   */
   onShareAppMessage() {
     const news = this.data.news;
     if (!news) {
@@ -369,7 +354,6 @@ Page({
       };
     }
 
-    // 构建分享标题，包含关键信息
     let shareTitle = news.title;
     if (news.category) {
       shareTitle = `【${news.category}】${news.title}`;
@@ -378,14 +362,10 @@ Page({
     return {
       title: shareTitle,
       path: `/pages/newsDetail/newsDetail?id=${news.id}`,
-      imageUrl: news.image || '' // 如果有封面图则使用
+      imageUrl: news.image || ''
     };
   },
 
-  /**
-   * 分享到朋友圈
-   * 用户可以将新闻分享到朋友圈，让更多人看到
-   */
   onShareTimeline() {
     const news = this.data.news;
     if (!news) {
@@ -395,7 +375,6 @@ Page({
       };
     }
 
-    // 构建分享标题，包含分类和标题
     let shareTitle = news.title;
     if (news.category) {
       shareTitle = `【${news.category}】${news.title}`;
@@ -404,7 +383,7 @@ Page({
     return {
       title: shareTitle,
       query: `id=${news.id}`,
-      imageUrl: news.image || '' // 如果有封面图则使用
+      imageUrl: news.image || ''
     };
   }
 });

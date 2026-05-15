@@ -21,30 +21,28 @@ const News = sequelize.define('News', {
   },
   category_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Category,
-      key: 'id'
-    }
+    allowNull: false
   },
   author: {
     type: DataTypes.STRING(50),
     allowNull: false
   },
-  date: {
-    type: DataTypes.DATE,
-    allowNull: false
+  image_url: {
+    type: DataTypes.TEXT
   },
   views: {
     type: DataTypes.INTEGER,
     defaultValue: 0
+  },
+  published_at: {
+    type: DataTypes.DATE
   }
 }, {
   timestamps: true,
-  tableName: 'news'
+  tableName: 'news',
+  underscored: true
 });
 
-// 关联关系
 News.belongsTo(Category, { foreignKey: 'category_id' });
 
 module.exports = News;

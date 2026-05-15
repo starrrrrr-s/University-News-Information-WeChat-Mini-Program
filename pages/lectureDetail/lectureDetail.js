@@ -1,7 +1,7 @@
 const data = require('../../utils/data.js');
 const app = getApp();
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://localhost:3001';
 
 Page({
   data: {
@@ -42,14 +42,35 @@ Page({
   },
 
   loadLecture(id) {
-    const lecture = data.getLectureById(id);
-    if (lecture) {
-      this.setData({ lecture });
-      wx.setNavigationBarTitle({ title: lecture.title });
-      this.loadComments(true);
-    } else {
-      wx.showToast({ title: '讲座不存在', icon: 'none' });
-    }
+    wx.showLoading({ title: '加载中...' });
+    wx.request({
+      url: `${BASE_URL}/api/lectures/${id}`,
+      method: 'GET',
+      success: (res) => {
+        if (res.data && res.data.success) {
+          const lecture = res.data.data;
+          this.setData({ lecture });
+          wx.setNavigationBarTitle({ title: lecture.title });
+          this.loadComments(true);
+        } else {
+          wx.showToast({ title: res.data.message || '讲座不存在', icon: 'none' });
+        }
+      },
+      fail: () => {
+        // 后端未启动时，从本地数据获取
+        const lecture = data.getLectureById(id);
+        if (lecture) {
+          this.setData({ lecture });
+          wx.setNavigationBarTitle({ title: lecture.title });
+          this.loadComments(true);
+        } else {
+          wx.showToast({ title: '讲座不存在', icon: 'none' });
+        }
+      },
+      complete: () => {
+        wx.hideLoading();
+      }
+    });
   },
 
   // ─── 评论功能 ────────────────────────────────────────────────

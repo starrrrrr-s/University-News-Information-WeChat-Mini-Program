@@ -1,6 +1,6 @@
 const app = getApp();
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://localhost:3001';
 
 // 处理状态映射
 const STATUS_MAP = {

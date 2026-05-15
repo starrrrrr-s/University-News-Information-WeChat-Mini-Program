@@ -1,5 +1,6 @@
-const data = require('../../utils/data.js');
 const util = require('../../utils/util.js');
+
+const BASE_URL = 'http://localhost:3001';
 
 Page({
   data: {
@@ -19,20 +20,17 @@ Page({
     this.loadLatestNews();
   },
 
-  // 微信原生下拉刷新回调
   onPullDownRefresh() {
     this.setData({ isRefreshing: true });
     this.loadBanner();
     this.loadLatestNews();
 
-    // 记录刷新时间
     const now = new Date();
     const h = String(now.getHours()).padStart(2, '0');
     const m = String(now.getMinutes()).padStart(2, '0');
     const s = String(now.getSeconds()).padStart(2, '0');
     const timeStr = `${h}:${m}:${s}`;
 
-    // 停止下拉动画，给用户明确的反馈
     setTimeout(() => {
       wx.stopPullDownRefresh();
       this.setData({ isRefreshing: false, lastRefreshTime: timeStr });
@@ -41,28 +39,51 @@ Page({
   },
 
   loadBanner() {
-    const banners = data.getBannerList();
-    this.setData({ bannerList: banners });
+    wx.request({
+      url: `${BASE_URL}/api/news/latest`,
+      method: 'GET',
+      data: { limit: 3 },
+      success: (res) => {
+        if (res.data && res.data.success) {
+          const banners = res.data.data.map((item, index) => ({
+            id: index + 1,
+            newsId: item.id,
+            image: item.image,
+            title: item.title
+          }));
+          this.setData({ bannerList: banners });
+        }
+      },
+      fail: () => {
+        console.log('获取轮播图失败');
+      }
+    });
   },
 
   loadLatestNews() {
-    // 按日期降序排列，确保最新内容优先展示
-    const newsList = data.getLatestNews(5);
-    const sorted = newsList.slice().sort((a, b) => {
-      return new Date(b.date) - new Date(a.date);
+    wx.request({
+      url: `${BASE_URL}/api/news/latest`,
+      method: 'GET',
+      data: { limit: 5 },
+      success: (res) => {
+        if (res.data && res.data.success) {
+          const newsList = res.data.data.map(item => ({
+            ...item,
+            categoryColor: util.getCategoryColor(item.categoryId)
+          }));
+          this.setData({ latestNews: newsList });
+        }
+      },
+      fail: () => {
+        console.log('获取最新新闻失败');
+      }
     });
-    const newsWithColor = sorted.map(item => ({
-      ...item,
-      categoryColor: util.getCategoryColor(item.categoryId)
-    }));
-    this.setData({ latestNews: newsWithColor });
   },
 
   onBannerTap(e) {
-    const id = e.currentTarget.dataset.id;
-    const banner = this.data.bannerList.find(item => item.id === id);
-    if (banner && banner.newsId) {
-      wx.navigateTo({ url: '/pages/newsDetail/newsDetail?id=' + banner.newsId });
+    const newsId = e.currentTarget.dataset.newsId;
+    if (newsId) {
+      wx.navigateTo({ url: '/pages/newsDetail/newsDetail?id=' + newsId });
     }
   },
 

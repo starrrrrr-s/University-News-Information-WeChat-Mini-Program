@@ -1,7 +1,7 @@
 const app = getApp();
 const util = require('../../utils/util.js');
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://localhost:3001';
 
 Page({
   data: {

@@ -56,7 +56,7 @@ const syncDatabase = async () => {
     await sequelize.sync({ force: false });
     console.log('数据库同步成功');
 
-    // 初始化分类数据
+    // 初始化分类数据（如果不存在）
     const categories = [
       { id: 1, name: '立德树人' },
       { id: 2, name: '科技创新' },
@@ -65,15 +65,15 @@ const syncDatabase = async () => {
     ];
 
     for (const category of categories) {
-      await Category.upsert({
-        id: category.id,
-        name: category.name
+      await Category.findOrCreate({
+        where: { id: category.id },
+        defaults: category
       });
     }
 
     console.log('初始化分类数据成功');
   } catch (error) {
-    console.error('数据库同步失败:', error);
+    console.error('数据库初始化警告:', error.message);
   }
 };
 

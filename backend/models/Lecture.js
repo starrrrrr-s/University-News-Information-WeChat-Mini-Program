@@ -44,7 +44,8 @@ const Lecture = sequelize.define('Lecture', {
   }
 }, {
   timestamps: true,
-  tableName: 'lectures'
+  tableName: 'lectures',
+  underscored: true
 });
 
 module.exports = Lecture;

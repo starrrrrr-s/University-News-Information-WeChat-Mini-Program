@@ -13,6 +13,7 @@
   color: #666666;
   background-color: #f5f5f5;
   border-radius: 30rpx;
+  transition: all 0.3s ease;
 }
 
 .tab-item.active {
@@ -24,26 +25,50 @@
   padding: 20rpx;
 }
 
-.news-item {
+.news-card {
   display: flex;
   background-color: #ffffff;
   border-radius: 12rpx;
-  padding: 24rpx;
+  padding: 20rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
 }
 
-.news-content {
+.card-image-wrapper {
+  width: 200rpx;
+  height: 150rpx;
+  border-radius: 8rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+  background-color: #f5f5f5;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+}
+
+.card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-content {
   flex: 1;
-  margin-right: 20rpx;
+  margin-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.news-title {
+.card-title {
   font-size: 30rpx;
   font-weight: bold;
   color: #333333;
   line-height: 1.4;
-  margin-bottom: 12rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -51,11 +76,11 @@
   -webkit-box-orient: vertical;
 }
 
-.news-summary {
+.card-summary {
   font-size: 26rpx;
   color: #666666;
   line-height: 1.6;
-  margin-bottom: 12rpx;
+  margin: 12rpx 0;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -63,7 +88,7 @@
   -webkit-box-orient: vertical;
 }
 
-.news-meta {
+.card-meta {
   display: flex;
   align-items: center;
   gap: 16rpx;
@@ -87,16 +112,6 @@
   color: #999999;
 }
 
-.news-thumb-placeholder {
-  width: 200rpx;
-  height: 150rpx;
-  border-radius: 8rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f0f0f0;
-}
-
 .placeholder-text {
   color: #ffffff;
   font-size: 48rpx;
@@ -110,13 +125,22 @@
   font-size: 28rpx;
 }
 
-.refresh-bar {
-  padding: 10rpx 30rpx;
-  background-color: #f8f8f8;
-  border-bottom: 1rpx solid #eeeeee;
+.loading-more {
+  text-align: center;
+  padding: 20rpx;
+  color: #999999;
+  font-size: 26rpx;
 }
 
-.refresh-time {
-  font-size: 22rpx;
-  color: #bbbbbb;
+.load-more-btn {
+  text-align: center;
+  padding: 30rpx;
+  margin: 20rpx 0;
+  background-color: #f5f5f5;
+  border-radius: 40rpx;
+}
+
+.load-more-btn text {
+  font-size: 28rpx;
+  color: #666666;
 }
