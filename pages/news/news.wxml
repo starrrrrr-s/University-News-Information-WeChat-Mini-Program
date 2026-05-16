@@ -1,0 +1,35 @@
+<view class="container">
+  <view class="category-tabs">
+    <view class="tab-item {{currentCategory === 0 ? 'active' : ''}}" data-id="0" bindtap="onTabChange">地大要闻</view>
+    <view class="tab-item {{currentCategory === item.id ? 'active' : ''}}" wx:for="{{categoryList}}" wx:key="id" data-id="{{item.id}}" bindtap="onTabChange">{{item.name}}</view>
+  </view>
+
+  <view class="news-list">
+    <view class="news-card {{item.image ? 'has-image' : 'no-image'}}" wx:for="{{newsList}}" wx:key="id" bindtap="onNewsTap" data-id="{{item.id}}">
+      <view wx:if="{{item.image}}" class="card-image-wrapper">
+        <image class="card-image" src="{{item.image}}" mode="aspectFill" />
+      </view>
+      <view class="card-content">
+        <view class="card-title">{{item.title}}</view>
+        <view class="card-summary">{{item.summary}}</view>
+        <view class="card-meta">
+          <text class="category-tag" style="background-color: {{item.categoryColor}}">{{item.category}}</text>
+          <text class="news-date">{{item.date}}</text>
+          <text class="news-views">{{item.views}} 阅读</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="loading-more" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="load-more-btn" wx:if="{{hasMore && !loading}}" bindtap="loadMore">
+    <text>加载更多</text>
+  </view>
+
+  <view class="empty-tip" wx:if="{{newsList.length === 0 && !loading}}">
+    <text>暂无新闻</text>
+  </view>
+</view>

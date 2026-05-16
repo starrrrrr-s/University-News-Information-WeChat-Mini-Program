@@ -1,0 +1,62 @@
+<view class="container">
+  <view class="admin-header">
+    <text class="admin-title">用户管理</text>
+  </view>
+
+  <view class="user-list">
+    <view class="user-item" wx:for="{{userList}}" wx:key="id">
+      <view class="user-info">
+        <image class="user-avatar" src="{{item.avatarUrl}}" mode="aspectFill" />
+        <view class="user-detail">
+          <view class="user-name">{{item.nickName}}</view>
+          <view class="user-meta">
+            <text class="user-role {{item.isAdmin ? 'admin' : ''}}">{{item.isAdmin ? '管理员' : '普通用户'}}</text>
+            <text class="user-date">注册于 {{item.registerDate}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="user-actions">
+        <button class="action-btn view-comments-btn" bindtap="onViewUserComments" data-id="{{item.id}}" data-name="{{item.nickName}}">查看评论</button>
+        <button class="action-btn {{item.isAdmin ? 'remove' : 'setAdmin'}}" bindtap="onToggleAdmin" data-id="{{item.id}}" data-isadmin="{{item.isAdmin}}">
+          {{item.isAdmin ? '取消管理员' : '设为管理员'}}
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-tip" wx:if="{{userList.length === 0}}">
+    <text>暂无用户</text>
+  </view>
+
+  <!-- 用户评论弹窗 -->
+  <view class="modal-mask" wx:if="{{showCommentModal}}" bindtap="onCloseCommentModal"></view>
+  <view class="comment-modal" wx:if="{{showCommentModal}}">
+    <view class="modal-header">
+      <text class="modal-title">{{currentUserName}} 的评论</text>
+      <text class="modal-close" bindtap="onCloseCommentModal">✕</text>
+    </view>
+
+    <scroll-view class="modal-body" scroll-y="true">
+      <view wx:if="{{userComments.length > 0}}">
+        <view class="user-comment-item" wx:for="{{userComments}}" wx:key="id">
+          <view class="uc-meta">
+            <text class="uc-type {{item.target_type === 'news' ? 'news-tag' : 'lecture-tag'}}">
+              {{item.target_type === 'news' ? '新闻' : '讲座'}}#{{item.target_id}}
+            </text>
+            <text class="uc-time">{{item.createdAt}}</text>
+          </view>
+          <view class="uc-content">{{item.content}}</view>
+          <view class="uc-actions">
+            <button class="uc-delete-btn" bindtap="onDeleteUserComment" data-id="{{item.id}}">删除</button>
+          </view>
+        </view>
+      </view>
+      <view class="empty-tip" wx:if="{{userComments.length === 0 && !commentsLoading}}">
+        <text>该用户暂无评论</text>
+      </view>
+      <view class="loading-tip" wx:if="{{commentsLoading}}">
+        <text>加载中...</text>
+      </view>
+    </scroll-view>
+  </view>
+</view>

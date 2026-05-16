@@ -1,0 +1,224 @@
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  background-color: #ffffff;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.admin-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.user-list {
+  padding: 20rpx;
+}
+
+.user-item {
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.user-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50rpx;
+  margin-right: 20rpx;
+  background-color: #f0f0f0;
+}
+
+.user-detail {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 10rpx;
+}
+
+.user-meta {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.user-role {
+  font-size: 24rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+  background-color: #f5f5f5;
+  color: #666666;
+}
+
+.user-role.admin {
+  background-color: #E64340;
+  color: #ffffff;
+}
+
+.user-date {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.user-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16rpx;
+}
+
+.action-btn {
+  font-size: 24rpx;
+  padding: 10rpx 24rpx;
+  border-radius: 6rpx;
+  border: none;
+}
+
+.view-comments-btn {
+  background-color: #007AFF;
+  color: #ffffff;
+}
+
+.action-btn.setAdmin {
+  background-color: #1AAD19;
+  color: #ffffff;
+}
+
+.action-btn.remove {
+  background-color: #FF9500;
+  color: #ffffff;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999999;
+  font-size: 28rpx;
+}
+
+/* ─── 评论弹窗 ───────────────────────────────────────────── */
+
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.comment-modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70vh;
+  background-color: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.modal-close {
+  font-size: 36rpx;
+  color: #999999;
+  padding: 0 10rpx;
+}
+
+.modal-body {
+  flex: 1;
+  padding: 20rpx;
+  overflow: hidden;
+}
+
+.user-comment-item {
+  background-color: #f8f8f8;
+  border-radius: 10rpx;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+}
+
+.uc-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.uc-type {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+.news-tag {
+  background-color: #e8f5e9;
+  color: #1AAD19;
+}
+
+.lecture-tag {
+  background-color: #e3f2fd;
+  color: #007AFF;
+}
+
+.uc-time {
+  font-size: 22rpx;
+  color: #bbbbbb;
+}
+
+.uc-content {
+  font-size: 28rpx;
+  color: #444444;
+  line-height: 1.6;
+  margin-bottom: 16rpx;
+}
+
+.uc-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.uc-delete-btn {
+  font-size: 24rpx;
+  padding: 8rpx 24rpx;
+  border-radius: 6rpx;
+  border: none;
+  background-color: #E64340;
+  color: #ffffff;
+}
+
+.loading-tip {
+  text-align: center;
+  padding: 40rpx 0;
+  color: #999999;
+  font-size: 26rpx;
+}

@@ -1,0 +1,26 @@
+<view class="container">
+  <view class="admin-header">
+    <text class="admin-title">新闻管理</text>
+    <button class="add-btn" bindtap="onAddNews">+ 添加新闻</button>
+  </view>
+
+  <view class="news-list">
+    <view class="news-item" wx:for="{{newsList}}" wx:key="id">
+      <view class="news-info">
+        <view class="news-title">{{item.title}}</view>
+        <view class="news-meta">
+          <text class="category-tag" style="background-color: {{item.categoryColor}}">{{item.category}}</text>
+          <text class="news-date">{{item.date}}</text>
+        </view>
+      </view>
+      <view class="news-actions">
+        <button class="action-btn edit" bindtap="onEditNews" data-id="{{item.id}}">编辑</button>
+        <button class="action-btn delete" bindtap="onDeleteNews" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-tip" wx:if="{{newsList.length === 0}}">
+    <text>暂无新闻</text>
+  </view>
+</view>

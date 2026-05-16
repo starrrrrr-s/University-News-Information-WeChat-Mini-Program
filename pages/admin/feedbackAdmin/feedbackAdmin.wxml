@@ -1,0 +1,96 @@
+<view class="feedback-admin">
+  <!-- 筛选栏 -->
+  <view class="filter-bar">
+    <picker mode="selector" range="{{['全部', '待处理', '处理中', '已处理']}}" bindchange="onFilterChange">
+      <view class="filter-picker">
+        <text>状态筛选</text>
+        <text class="picker-arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 反馈列表 -->
+  <view class="feedback-list" wx:if="{{feedbackList.length > 0}}">
+    <view class="feedback-item" wx:for="{{feedbackList}}" wx:key="id">
+      <view class="feedback-header">
+        <view class="feedback-meta">
+          <text class="feedback-type">{{item.type}}</text>
+          <text class="feedback-status {{item.statusClass}}">{{item.statusText}}</text>
+        </view>
+        <text class="feedback-time">{{item.created_at}}</text>
+      </view>
+      
+      <view class="feedback-user">
+        <text class="user-name">{{item.user ? item.user.nickname : '匿名用户'}}</text>
+        <text class="contact" wx:if="{{item.contact}}">联系方式：{{item.contact}}</text>
+      </view>
+
+      <view class="feedback-content">
+        <text>{{item.content}}</text>
+      </view>
+
+      <view class="feedback-reply" wx:if="{{item.reply}}">
+        <view class="reply-label">管理员回复：</view>
+        <text class="reply-content">{{item.reply}}</text>
+      </view>
+
+      <view class="feedback-actions">
+        <button class="action-btn reply-btn" bindtap="showReplyDialog" data-id="{{item.id}}" data-type="{{item.type}}" data-content="{{item.content}}">
+          回复
+        </button>
+        <button class="action-btn delete-btn" bindtap="deleteFeedback" data-id="{{item.id}}">
+          删除
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && feedbackList.length === 0}}">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">暂无反馈</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 没有更多 -->
+  <view class="no-more" wx:if="{{!hasMore && feedbackList.length > 0}}">
+    <text>没有更多了</text>
+  </view>
+</view>
+
+<!-- 回复弹窗 -->
+<view class="modal-mask" wx:if="{{showReplyModal}}" bindtap="hideReplyModal">
+  <view class="modal-content" catchtap="">
+    <view class="modal-header">
+      <text class="modal-title">回复反馈</text>
+      <text class="modal-close" bindtap="hideReplyModal">×</text>
+    </view>
+    
+    <view class="modal-body">
+      <view class="original-feedback" wx:if="{{currentFeedback}}">
+        <view class="label">原始反馈：</view>
+        <text>{{currentFeedback.content}}</text>
+      </view>
+      
+      <view class="reply-input-section">
+        <view class="label">回复内容：</view>
+        <textarea 
+          class="reply-textarea" 
+          placeholder="请输入回复内容..."
+          value="{{replyContent}}"
+          bindinput="onReplyInput"
+          maxlength="500"
+        />
+      </view>
+    </view>
+
+    <view class="modal-footer">
+      <button class="cancel-btn" bindtap="hideReplyModal">取消</button>
+      <button class="confirm-btn" bindtap="submitReply">确认回复</button>
+    </view>
+  </view>
+</view>

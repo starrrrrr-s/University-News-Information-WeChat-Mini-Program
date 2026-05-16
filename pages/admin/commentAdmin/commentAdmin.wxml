@@ -1,0 +1,73 @@
+<view class="container">
+  <view class="admin-header">
+    <text class="admin-title">评论管理</text>
+  </view>
+
+  <!-- 筛选栏 -->
+  <view class="filter-bar">
+    <view class="filter-item {{filterType === 'all' ? 'active' : ''}}" bindtap="onFilterType" data-type="all">全部</view>
+    <view class="filter-item {{filterType === 'news' ? 'active' : ''}}" bindtap="onFilterType" data-type="news">新闻评论</view>
+    <view class="filter-item {{filterType === 'lecture' ? 'active' : ''}}" bindtap="onFilterType" data-type="lecture">讲座评论</view>
+  </view>
+
+  <view class="status-bar">
+    <view class="status-item {{filterStatus === '' ? 'active' : ''}}" bindtap="onFilterStatus" data-status="">全部状态</view>
+    <view class="status-item {{filterStatus === '0' ? 'active' : ''}}" bindtap="onFilterStatus" data-status="0">待审核</view>
+    <view class="status-item {{filterStatus === '1' ? 'active' : ''}}" bindtap="onFilterStatus" data-status="1">已通过</view>
+    <view class="status-item {{filterStatus === '2' ? 'active' : ''}}" bindtap="onFilterStatus" data-status="2">已拒绝</view>
+  </view>
+
+  <!-- 评论列表 -->
+  <view class="comment-list">
+    <view class="comment-card" wx:for="{{commentList}}" wx:key="id">
+      <!-- 顶部信息 -->
+      <view class="card-header">
+        <view class="user-info">
+          <view class="avatar-small">
+            <text>{{item.user ? item.user.nickname.charAt(0) : '?'}}</text>
+          </view>
+          <text class="user-name">{{item.user ? item.user.nickname : '匿名用户'}}</text>
+        </view>
+        <view class="meta-right">
+          <text class="target-tag {{item.target_type === 'news' ? 'news-tag' : 'lecture-tag'}}">
+            {{item.target_type === 'news' ? '新闻' : '讲座'}}#{{item.target_id}}
+          </text>
+          <view class="status-badge status-{{item.status}}">
+            {{item.status === 0 ? '待审核' : item.status === 1 ? '已通过' : '已拒绝'}}
+          </view>
+          <view class="top-badge" wx:if="{{item.is_top}}">置顶</view>
+        </view>
+      </view>
+
+      <!-- 评论内容 -->
+      <view class="card-content">{{item.content}}</view>
+      <view class="card-time">{{item.createdAt}}</view>
+
+      <!-- 操作按钮 -->
+      <view class="card-actions">
+        <!-- 审核操作 -->
+        <button wx:if="{{item.status !== 1}}" class="action-btn approve-btn" bindtap="onApprove" data-id="{{item.id}}">通过</button>
+        <button wx:if="{{item.status !== 2}}" class="action-btn reject-btn" bindtap="onReject" data-id="{{item.id}}">拒绝</button>
+        <!-- 置顶操作 -->
+        <button wx:if="{{item.status === 1 && !item.is_top}}" class="action-btn top-btn" bindtap="onSetTop" data-id="{{item.id}}" data-top="1">置顶</button>
+        <button wx:if="{{item.is_top}}" class="action-btn untop-btn" bindtap="onSetTop" data-id="{{item.id}}" data-top="0">取消置顶</button>
+        <!-- 删除 -->
+        <button class="action-btn delete-btn" bindtap="onDelete" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-tip" wx:if="{{commentList.length === 0 && !loading}}">
+    <text>暂无评论数据</text>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{hasMore}}" bindtap="loadMore">
+    <text>加载更多</text>
+  </view>
+
+  <view class="loading-tip" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>

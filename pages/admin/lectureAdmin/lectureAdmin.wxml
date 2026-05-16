@@ -1,0 +1,26 @@
+<view class="container">
+  <view class="admin-header">
+    <text class="admin-title">讲座管理</text>
+    <button class="add-btn" bindtap="onAddLecture">+ 添加讲座</button>
+  </view>
+
+  <view class="lecture-list">
+    <view class="lecture-item" wx:for="{{lectureList}}" wx:key="id">
+      <view class="lecture-info">
+        <view class="lecture-title">{{item.title}}</view>
+        <view class="lecture-meta">
+          <text class="lecture-time">{{item.time}}</text>
+          <text class="lecture-location">{{item.location}}</text>
+        </view>
+      </view>
+      <view class="lecture-actions">
+        <button class="action-btn edit" bindtap="onEditLecture" data-id="{{item.id}}">编辑</button>
+        <button class="action-btn delete" bindtap="onDeleteLecture" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-tip" wx:if="{{lectureList.length === 0}}">
+    <text>暂无讲座</text>
+  </view>
+</view>
