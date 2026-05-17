@@ -49,7 +49,7 @@ const Comment = sequelize.define('Comment', {
     defaultValue: 0
   }
 }, {
-  timestamps: true,
+  timestamps: false,
   tableName: 'comments'
 });
 
