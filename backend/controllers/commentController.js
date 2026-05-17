@@ -33,7 +33,7 @@ const getCommentList = async (req, res) => {
       ],
       order: [
         ['is_top', 'DESC'],   // 置顶评论优先
-        ['createdAt', 'ASC']  // 按时间升序
+        ['id', 'ASC']  // 按ID升序（等价于按时间顺序）
       ],
       limit: parseInt(limit),
       offset
@@ -159,7 +159,7 @@ const adminGetCommentList = async (req, res) => {
       ],
       order: [
         ['is_top', 'DESC'],
-        ['createdAt', 'DESC']
+        ['id', 'DESC']
       ],
       limit: parseInt(limit),
       offset
@@ -263,7 +263,7 @@ const adminGetUserComments = async (req, res) => {
           attributes: ['id', 'nickname', 'avatar_url']
         }
       ],
-      order: [['createdAt', 'DESC']],
+      order: [['id', 'DESC']],
       limit: parseInt(limit),
       offset
     });
