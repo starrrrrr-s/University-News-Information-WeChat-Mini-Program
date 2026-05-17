@@ -1,4 +1,7 @@
+const util = require('../../../utils/util.js');
 const data = require('../../../utils/data.js');
+
+const BASE_URL = 'http://localhost:3001';
 
 Page({
   data: {
@@ -18,14 +21,12 @@ Page({
   },
 
   onLoad(options) {
-    this.loadCategories();
-    if (options.id) {
+    this.newsId = options.id || null;
+    if (this.newsId) {
       this.setData({ isEdit: true });
-      this.loadNews(parseInt(options.id));
       wx.setNavigationBarTitle({ title: '编辑新闻' });
     } else {
       wx.setNavigationBarTitle({ title: '添加新闻' });
-      // 默认日期为今天
       const today = new Date();
       const y = today.getFullYear();
       const m = String(today.getMonth() + 1).padStart(2, '0');
@@ -38,32 +39,72 @@ Page({
         publishTime: `${h}:${minute}`
       });
     }
+    this.loadCategories();
   },
 
   loadCategories() {
-    const categories = data.getCategoryList();
-    this.setData({ categoryList: categories });
+    wx.request({
+      url: `${BASE_URL}/api/categories`,
+      method: 'GET',
+      success: (res) => {
+        if (res.data && res.data.success) {
+          this.setData({ categoryList: res.data.data });
+        } else {
+          this.setData({ categoryList: data.getCategoryList() });
+        }
+        if (this.newsId) {
+          this.loadNews(this.newsId);
+        }
+      },
+      fail: () => {
+        this.setData({ categoryList: data.getCategoryList() });
+        if (this.newsId) {
+          this.loadNews(this.newsId);
+        }
+      }
+    });
   },
 
   loadNews(id) {
-    const news = data.getNewsByIdForAdmin(id);
-    if (news) {
-      const categories = this.data.categoryList;
-      const idx = categories.findIndex(c => c.id === news.categoryId);
-      this.setData({
-        newsId: news.id,
-        title: news.title,
-        categoryId: news.categoryId,
-        selectedCategoryIndex: idx >= 0 ? idx : 0,
-        author: news.author,
-        date: news.date,
-        summary: news.summary,
-        content: news.content,
-        isTimedPublish: news.isTimed || false,
-        publishDate: news.date || '',
-        publishTime: news.publishTime || ''
-      });
-    }
+    wx.request({
+      url: `${BASE_URL}/api/news/${id}`,
+      method: 'GET',
+      header: {
+        'Authorization': 'Bearer ' + wx.getStorageSync('token')
+      },
+      success: (res) => {
+        if (res.data && res.data.success) {
+          const news = res.data.data;
+          const categories = this.data.categoryList;
+          const idx = categories.findIndex(c => c.id === news.categoryId);
+          
+          let publishTime = '';
+          if (news.published_at) {
+            const pubDate = new Date(news.published_at);
+            publishTime = `${String(pubDate.getHours()).padStart(2, '0')}:${String(pubDate.getMinutes()).padStart(2, '0')}`;
+          }
+          
+          this.setData({
+            newsId: news.id,
+            title: news.title,
+            categoryId: news.categoryId,
+            selectedCategoryIndex: idx >= 0 ? idx : 0,
+            author: news.author,
+            date: news.date,
+            summary: news.summary,
+            content: news.content,
+            isTimedPublish: news.isTimed || false,
+            publishDate: news.date || '',
+            publishTime: publishTime
+          });
+        } else {
+          wx.showToast({ title: '获取新闻详情失败', icon: 'none' });
+        }
+      },
+      fail: () => {
+        wx.showToast({ title: '网络请求失败', icon: 'none' });
+      }
+    });
   },
 
   onTitleInput(e) {
@@ -108,7 +149,7 @@ Page({
   },
 
   onSave() {
-    const { title, categoryId, author, date, summary, content, categoryList, isTimedPublish, publishDate, publishTime } = this.data;
+    const { title, categoryId, author, date, summary, content, isTimedPublish, publishDate, publishTime } = this.data;
 
     if (!title.trim()) {
       wx.showToast({ title: '请输入标题', icon: 'none' });
@@ -135,31 +176,40 @@ Page({
       return;
     }
 
-    const categoryObj = categoryList.find(c => c.id === categoryId) || categoryList[0];
     const newsItem = {
       title: title.trim(),
-      categoryId: categoryObj.id,
-      category: categoryObj.name,
+      category_id: categoryId,
       author: author.trim(),
-      date: isTimedPublish ? publishDate : date,
-      publishTime: isTimedPublish ? publishTime : null,
-      isTimed: isTimedPublish,
       summary: summary.trim(),
       content: content.trim(),
-      image: '/images/news_default.jpg'
+      published_at: isTimedPublish ? `${publishDate} ${publishTime}` : date
     };
 
-    if (this.data.isEdit) {
-      newsItem.id = this.data.newsId;
-      data.updateNews(newsItem);
-      wx.showToast({ title: '更新成功', icon: 'success' });
-    } else {
-      data.addNews(newsItem);
-      wx.showToast({ title: isTimedPublish ? '定时发布设置成功' : '添加成功', icon: 'success' });
-    }
+    const url = this.data.isEdit ? `${BASE_URL}/api/news/${this.data.newsId}` : `${BASE_URL}/api/news`;
+    const method = this.data.isEdit ? 'PUT' : 'POST';
 
-    setTimeout(() => {
-      wx.navigateBack();
-    }, 1500);
+    wx.request({
+      url: url,
+      method: method,
+      header: {
+        'Authorization': 'Bearer ' + wx.getStorageSync('token'),
+        'Content-Type': 'application/json'
+      },
+      data: newsItem,
+      success: (res) => {
+        if (res.data && res.data.success) {
+          const msg = this.data.isEdit ? '更新成功' : (isTimedPublish ? '定时发布设置成功' : '添加成功');
+          wx.showToast({ title: msg, icon: 'success' });
+          setTimeout(() => {
+            wx.navigateBack();
+          }, 1500);
+        } else {
+          wx.showToast({ title: this.data.isEdit ? '更新失败' : '添加失败', icon: 'none' });
+        }
+      },
+      fail: () => {
+        wx.showToast({ title: '网络请求失败', icon: 'none' });
+      }
+    });
   }
 });

@@ -66,7 +66,7 @@
 
     <view class="form-item">
       <text class="form-label required">正文内容</text>
-      <textarea class="form-textarea content" placeholder="请输入新闻正文内容" value="{{content}}" bindinput="onContentInput" />
+      <textarea class="form-textarea content" placeholder="请输入新闻正文内容" value="{{content}}" bindinput="onContentInput" maxlength="5000" />
     </view>
   </view>
 
