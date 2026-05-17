@@ -1,7 +1,7 @@
 App({
   globalData: {
     userInfo: null,
-    isAdmin: true
+    isAdmin: false
   },
 
   onLaunch() {

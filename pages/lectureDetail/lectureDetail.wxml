@@ -1,12 +1,5 @@
 <view class="container">
   <view class="lecture-detail" wx:if="{{lecture}}">
-    <view class="lecture-image-wrapper">
-      <view class="lecture-placeholder" style="background: linear-gradient(135deg, #1AAD19, #007AFF);">
-        <text class="placeholder-text">{{lecture.category.charAt(0)}}</text>
-      </view>
-      <view class="lecture-badge {{lecture.isFree ? 'free' : 'paid'}}">{{lecture.isFree ? '免费' : '收费'}}</view>
-    </view>
-
     <view class="lecture-content">
       <view class="lecture-title">{{lecture.title}}</view>
 
