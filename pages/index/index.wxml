@@ -42,29 +42,32 @@
       </view>
     </view>
 
-    <view wx:if="{{searchMode === 'year'}}" class="date-picker-section">
-      <view class="date-picker-box" bindtap="onYearPickerTap">
-        <text class="date-icon">📅</text>
-        <text class="date-text">{{searchYear || '选择年份'}}</text>
+    <view class="date-picker-section" wx:if="{{searchMode === 'year' || searchMode === 'month' || searchMode === 'day'}}">
+      <view class="date-picker-row">
+        <view class="date-picker-unit" wx:if="{{searchMode === 'year' || searchMode === 'month' || searchMode === 'day'}}">
+          <view class="date-picker-label">年份</view>
+          <view class="date-picker-box" bindtap="onYearPickerTap">
+            <text class="date-text">{{searchYear || '选择年份'}}</text>
+            <text class="date-arrow">▼</text>
+          </view>
+        </view>
+        
+        <view class="date-picker-unit" wx:if="{{(searchMode === 'month' || searchMode === 'day') && searchYear}}">
+          <view class="date-picker-label">月份</view>
+          <view class="date-picker-box" bindtap="onMonthPickerTap">
+            <text class="date-text">{{monthText || '选择月份'}}</text>
+            <text class="date-arrow">▼</text>
+          </view>
+        </view>
+        
+        <view class="date-picker-unit" wx:if="{{searchMode === 'day' && searchYear && searchMonth}}">
+          <view class="date-picker-label">日期</view>
+          <view class="date-picker-box" bindtap="onDayPickerTap">
+            <text class="date-text">{{dayText || '选择日期'}}</text>
+            <text class="date-arrow">▼</text>
+          </view>
+        </view>
       </view>
-    </view>
-
-    <view wx:if="{{searchMode === 'month'}}" class="date-picker-section">
-      <picker mode="date" value="{{searchMonth}}" start="2020-01" end="2030-12" fields="month" bindchange="onMonthSelect">
-        <view class="date-picker-box">
-          <text class="date-icon">📅</text>
-          <text class="date-text">{{searchMonth || '选择月份'}}</text>
-        </view>
-      </picker>
-    </view>
-
-    <view wx:if="{{searchMode === 'day'}}" class="date-picker-section">
-      <picker mode="date" value="{{searchDate}}" start="2020-01-01" end="2030-12-31" bindchange="onDaySelect">
-        <view class="date-picker-box">
-          <text class="date-icon">📅</text>
-          <text class="date-text">{{searchDate || '选择日期'}}</text>
-        </view>
-      </picker>
     </view>
 
     <view class="search-dropdown" wx:if="{{showSearchResults}}">
@@ -80,14 +83,18 @@
           bindtap="onSearchResultTap"
           data-id="{{item.id}}"
         >
-          <view class="result-image-wrapper">
-            <image wx:if="{{item.image}}" class="result-image" src="{{item.image}}" mode="aspectFill" />
-            <view wx:else class="result-placeholder" style="background-color: {{item.categoryColor}};">
-              <text class="placeholder-text">{{item.category.charAt(0)}}</text>
-            </view>
+          <view wx:if="{{item.image}}" class="result-image-wrapper">
+            <image class="result-image" src="{{item.image}}" mode="aspectFill" />
           </view>
-          <view class="result-content">
-            <view class="result-title">{{item.title}}</view>
+          <view class="result-content {{item.image ? '' : 'result-content-no-image'}}">
+            <view class="result-title">
+              <text
+                wx:for="{{item.titleParts}}"
+                wx:key="index"
+                class="{{item.highlight ? 'title-highlight' : 'title-normal'}}"
+              >{{item.text}}</text>
+              <text wx:if="{{!item.titleParts}}">{{item.title}}</text>
+            </view>
             <view class="result-meta">
               <text class="category-tag" style="background-color: {{item.categoryColor}}">{{item.category}}</text>
               <text class="result-date">{{item.date}}</text>
@@ -118,13 +125,10 @@
     </view>
     <view class="news-list">
       <view class="news-item" wx:for="{{latestNews}}" wx:key="id" bindtap="onNewsTap" data-id="{{item.id}}">
-        <view class="news-image-wrapper">
-          <image wx:if="{{item.image}}" class="news-image" src="{{item.image}}" mode="aspectFill" />
-          <view wx:else class="news-placeholder" style="background-color: {{item.categoryColor}};">
-            <text class="placeholder-text">{{item.category.charAt(0)}}</text>
-          </view>
+        <view wx:if="{{item.image}}" class="news-image-wrapper">
+          <image class="news-image" src="{{item.image}}" mode="aspectFill" />
         </view>
-        <view class="news-content">
+        <view class="news-content {{item.image ? '' : 'news-content-no-image'}}">
           <text class="news-title">{{item.title}}</text>
           <view class="news-meta">
             <text class="category-tag" style="background-color: {{item.categoryColor}}">{{item.category}}</text>
@@ -132,6 +136,12 @@
           </view>
         </view>
       </view>
+    </view>
+    <view class="latest-loading" wx:if="{{latestLoading}}">
+      <text>加载中...</text>
+    </view>
+    <view class="latest-no-more" wx:if="{{!latestHasMore && latestNews.length > 0}}">
+      <text>已加载全部新闻</text>
     </view>
   </view>
 
@@ -152,6 +162,46 @@
           data-year="{{item}}"
         >
           {{item}}年
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <view wx:if="{{showMonthPicker}}" class="year-picker-mask" bindtap="onMonthPickerClose">
+    <view class="year-picker-container" catchtap="stopPropagation">
+      <view class="year-picker-header">
+        <text class="year-picker-title">选择月份</text>
+        <text class="year-picker-close" bindtap="onMonthPickerClose">✕</text>
+      </view>
+      <scroll-view class="year-picker-content" scroll-y>
+        <view 
+          wx:for="{{monthList}}" 
+          wx:key="index"
+          class="year-picker-item {{searchMonth === item ? 'selected' : ''}}"
+          bindtap="onMonthSelect"
+          data-month="{{item}}"
+        >
+          {{item}}月
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <view wx:if="{{showDayPicker}}" class="year-picker-mask" bindtap="onDayPickerClose">
+    <view class="year-picker-container" catchtap="stopPropagation">
+      <view class="year-picker-header">
+        <text class="year-picker-title">选择日期</text>
+        <text class="year-picker-close" bindtap="onDayPickerClose">✕</text>
+      </view>
+      <scroll-view class="year-picker-content" scroll-y>
+        <view 
+          wx:for="{{dayList}}" 
+          wx:key="index"
+          class="year-picker-item {{searchDay === item ? 'selected' : ''}}"
+          bindtap="onDaySelect"
+          data-day="{{item}}"
+        >
+          {{item}}日
         </view>
       </scroll-view>
     </view>

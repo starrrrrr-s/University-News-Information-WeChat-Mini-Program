@@ -43,11 +43,11 @@
   padding: 20rpx;
   margin-bottom: 20rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
-  height: 190rpx;
 }
 
 .news-card.has-image {
   display: flex;
+  min-height: 190rpx;
 }
 
 .news-card.no-image {
@@ -81,7 +81,7 @@
 }
 
 .no-image .card-content {
-  height: 150rpx;
+  height: auto;
 }
 
 .card-title {

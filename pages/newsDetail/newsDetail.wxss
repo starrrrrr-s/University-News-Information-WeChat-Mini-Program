@@ -43,25 +43,6 @@
   color: #dddddd;
 }
 
-.news-cover {
-  margin: 0 0 20rpx;
-}
-
-.news-placeholder {
-  width: 100%;
-  height: 400rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.placeholder-text {
-  color: #ffffff;
-  font-size: 120rpx;
-  font-weight: bold;
-  opacity: 0.6;
-}
-
 .news-images {
   margin: 0 0 20rpx;
   background-color: #000000;
@@ -349,4 +330,61 @@
 .send-btn[disabled] {
   background-color: #cccccc;
   color: #ffffff;
+}
+
+/* 查看原文样式 */
+.source-link-section {
+  margin-top: 30rpx;
+  padding: 30rpx;
+  background-color: #ffffff;
+}
+
+.source-divider {
+  height: 2rpx;
+  background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
+  margin-bottom: 30rpx;
+}
+
+.source-link {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.source-label {
+  font-size: 28rpx;
+  color: #666666;
+  font-weight: 500;
+}
+
+.source-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #f5f9ff, #f0f7ff);
+  border: 2rpx solid #e0f0ff;
+  border-radius: 16rpx;
+  padding: 24rpx 28rpx;
+  transition: all 0.3s ease;
+}
+
+.source-btn:active {
+  background: linear-gradient(135deg, #e0f0ff, #d0e8ff);
+  transform: scale(0.98);
+}
+
+.source-url {
+  flex: 1;
+  font-size: 24rpx;
+  color: #007AFF;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 16rpx;
+}
+
+.source-arrow {
+  font-size: 32rpx;
+  color: #007AFF;
+  font-weight: bold;
 }

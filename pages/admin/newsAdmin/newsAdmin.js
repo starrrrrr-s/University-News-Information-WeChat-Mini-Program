@@ -1,11 +1,9 @@
+const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
-
-const BASE_URL = 'http://localhost:3001';
 
 Page({
   data: {
-    newsList: [],
-    isLoading: false
+    newsList: []
   },
 
   onLoad() {
@@ -17,31 +15,12 @@ Page({
   },
 
   loadNews() {
-    this.setData({ isLoading: true });
-    wx.request({
-      url: `${BASE_URL}/api/news`,
-      method: 'GET',
-      header: {
-        'Authorization': 'Bearer ' + wx.getStorageSync('token')
-      },
-      success: (res) => {
-        if (res.data && res.data.success) {
-          const newsWithColor = res.data.data.map(item => ({
-            ...item,
-            categoryColor: util.getCategoryColor(item.categoryId)
-          }));
-          this.setData({ newsList: newsWithColor });
-        } else {
-          wx.showToast({ title: '获取新闻列表失败', icon: 'none' });
-        }
-      },
-      fail: () => {
-        wx.showToast({ title: '网络请求失败', icon: 'none' });
-      },
-      complete: () => {
-        this.setData({ isLoading: false });
-      }
-    });
+    const newsList = data.getAllNewsList();
+    const newsWithColor = newsList.map(item => ({
+      ...item,
+      categoryColor: util.getCategoryColor(item.categoryId)
+    }));
+    this.setData({ newsList: newsWithColor });
   },
 
   onAddNews() {
@@ -64,24 +43,13 @@ Page({
       content: '确定要删除这条新闻吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.request({
-            url: `${BASE_URL}/api/news/${id}`,
-            method: 'DELETE',
-            header: {
-              'Authorization': 'Bearer ' + wx.getStorageSync('token')
-            },
-            success: (res) => {
-              if (res.data && res.data.success) {
-                wx.showToast({ title: '删除成功', icon: 'success' });
-                this.loadNews();
-              } else {
-                wx.showToast({ title: '删除失败', icon: 'none' });
-              }
-            },
-            fail: () => {
-              wx.showToast({ title: '网络请求失败', icon: 'none' });
-            }
-          });
+          const success = data.deleteNews(id);
+          if (success) {
+            wx.showToast({ title: '删除成功', icon: 'success' });
+            this.loadNews();
+          } else {
+            wx.showToast({ title: '删除失败', icon: 'none' });
+          }
         }
       }
     });

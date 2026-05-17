@@ -36,16 +36,23 @@
       </swiper>
     </view>
     
-    <!-- 无图片时的占位 -->
-    <view class="news-cover" wx:if="{{!news.images || news.images.length === 0}}">
-      <view class="news-placeholder" style="background: linear-gradient(135deg, {{news.categoryColor}}, #007AFF);">
-        <text class="placeholder-text">{{news.category.charAt(0)}}</text>
-      </view>
-    </view>
+    <!-- 无图片时不显示任何占位 -->
 
     <!-- 正文 -->
     <view class="news-content">
       <text style="font-size: {{fontSize}}rpx; line-height: 1.9;">{{news.content}}</text>
+    </view>
+
+    <!-- 查看原文按钮 -->
+    <view class="source-link-section" wx:if="{{news.sourceUrl}}">
+      <view class="source-divider"></view>
+      <view class="source-link">
+        <text class="source-label">查看原文</text>
+        <view class="source-btn" bindtap="onOpenSourceUrl">
+          <text class="source-url">{{news.sourceUrl}}</text>
+          <text class="source-arrow">→</text>
+        </view>
+      </view>
     </view>
 
     <!-- 评论区 -->

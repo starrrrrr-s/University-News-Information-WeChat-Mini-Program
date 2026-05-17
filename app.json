@@ -16,7 +16,8 @@
     "pages/admin/lectureEdit/lectureEdit",
     "pages/admin/userAdmin/userAdmin",
     "pages/admin/commentAdmin/commentAdmin",
-    "pages/admin/feedbackAdmin/feedbackAdmin"
+    "pages/admin/feedbackAdmin/feedbackAdmin",
+    "pages/webview/webview"
   ],
   "window": {
     "navigationBarTextStyle": "white",

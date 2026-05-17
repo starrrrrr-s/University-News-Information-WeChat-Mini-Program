@@ -52,8 +52,18 @@ Page({
       success: (res) => {
         if (res.data && res.data.success) {
           const news = res.data.data;
+          // 将图片URL转换为数组格式
+          let images = [];
+          if (news.image_url) {
+            images = [news.image_url];
+          } else if (news.image) {
+            images = [news.image];
+          }
+          
           const newsWithColor = {
             ...news,
+            images: images,
+            sourceUrl: news.source_url || '',
             categoryColor: util.getCategoryColor(news.categoryId)
           };
           this.setData({ news: newsWithColor });
@@ -399,6 +409,33 @@ Page({
       success: () => {},
       fail: () => {
         wx.showToast({ title: '预览失败', icon: 'none' });
+      }
+    });
+  },
+
+  onOpenSourceUrl() {
+    const news = this.data.news;
+    if (!news || !news.sourceUrl) {
+      wx.showToast({ title: '暂无原文链接', icon: 'none' });
+      return;
+    }
+
+    wx.navigateTo({
+      url: `/pages/webview/webview?url=${encodeURIComponent(news.sourceUrl)}`,
+      fail: () => {
+        // 跳转失败时降级为复制链接
+        wx.setClipboardData({
+          data: news.sourceUrl,
+          success: () => {
+            wx.showModal({
+              title: '链接已复制',
+              content: '原文链接已复制到剪贴板，你可以在浏览器中打开查看。',
+              showCancel: false,
+              confirmText: '好的',
+              confirmColor: '#1AAD19'
+            });
+          }
+        });
       }
     });
   }

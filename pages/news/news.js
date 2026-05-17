@@ -20,7 +20,10 @@ Page({
   },
 
   onShow() {
-    this.loadNews();
+    // 只在首次加载时刷新，避免切回来重置已加载的列表
+    if (this.data.newsList.length === 0) {
+      this.loadNews(true);
+    }
   },
 
   onPullDownRefresh() {
@@ -70,18 +73,15 @@ Page({
     const page = reset ? 1 : this.data.page;
     const isLatest = this.data.currentCategory === 0;
 
-    let url = isLatest ? `${BASE_URL}/api/news/latest` : `${BASE_URL}/api/news`;
-    let data = {
-      page,
-      limit: this.data.limit
-    };
-    
+    // 统一使用 /api/news 接口，支持分页
+    // 地大要闻不传 category_id，获取全部新闻
+    const data = { page, limit: this.data.limit };
     if (!isLatest) {
       data.category_id = this.data.currentCategory;
     }
 
     wx.request({
-      url: url,
+      url: `${BASE_URL}/api/news`,
       method: 'GET',
       data: data,
       success: (res) => {
@@ -93,7 +93,7 @@ Page({
 
           const newsList = reset ? newsWithColor : [...this.data.newsList, ...newsWithColor];
           const pagination = res.data.pagination || {};
-          const hasMore = page < pagination.pages;
+          const hasMore = page < (pagination.pages || 1);
 
           this.setData({
             newsList,
@@ -101,6 +101,8 @@ Page({
             hasMore,
             loading: false
           });
+        } else {
+          this.setData({ loading: false });
         }
       },
       fail: () => {
