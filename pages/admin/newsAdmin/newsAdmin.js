@@ -1,9 +1,11 @@
-const data = require('../../../utils/data.js');
 const util = require('../../../utils/util.js');
+
+const BASE_URL = 'http://localhost:3001';
 
 Page({
   data: {
-    newsList: []
+    newsList: [],
+    isLoading: false
   },
 
   onLoad() {
@@ -15,12 +17,32 @@ Page({
   },
 
   loadNews() {
-    const newsList = data.getAllNewsList();
-    const newsWithColor = newsList.map(item => ({
-      ...item,
-      categoryColor: util.getCategoryColor(item.categoryId)
-    }));
-    this.setData({ newsList: newsWithColor });
+    this.setData({ isLoading: true });
+    wx.request({
+      url: `${BASE_URL}/api/news`,
+      method: 'GET',
+      header: {
+        'Authorization': 'Bearer ' + wx.getStorageSync('token')
+      },
+      success: (res) => {
+        if (res.data && res.data.success) {
+          const newsList = res.data.data.list || res.data.data;
+          const newsWithColor = newsList.map(item => ({
+            ...item,
+            categoryColor: util.getCategoryColor(item.categoryId)
+          }));
+          this.setData({ newsList: newsWithColor });
+        } else {
+          wx.showToast({ title: '获取新闻列表失败', icon: 'none' });
+        }
+      },
+      fail: () => {
+        wx.showToast({ title: '网络请求失败', icon: 'none' });
+      },
+      complete: () => {
+        this.setData({ isLoading: false });
+      }
+    });
   },
 
   onAddNews() {
@@ -43,13 +65,24 @@ Page({
       content: '确定要删除这条新闻吗？',
       success: (res) => {
         if (res.confirm) {
-          const success = data.deleteNews(id);
-          if (success) {
-            wx.showToast({ title: '删除成功', icon: 'success' });
-            this.loadNews();
-          } else {
-            wx.showToast({ title: '删除失败', icon: 'none' });
-          }
+          wx.request({
+            url: `${BASE_URL}/api/news/${id}`,
+            method: 'DELETE',
+            header: {
+              'Authorization': 'Bearer ' + wx.getStorageSync('token')
+            },
+            success: (res) => {
+              if (res.data && res.data.success) {
+                wx.showToast({ title: '删除成功', icon: 'success' });
+                this.loadNews();
+              } else {
+                wx.showToast({ title: '删除失败', icon: 'none' });
+              }
+            },
+            fail: () => {
+              wx.showToast({ title: '网络请求失败', icon: 'none' });
+            }
+          });
         }
       }
     });
