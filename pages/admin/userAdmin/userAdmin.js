@@ -1,5 +1,6 @@
 const BASE_URL = 'http://localhost:3000';
 const STORAGE_KEY_USERS = 'user_list';
+const app = getApp();
 
 const defaultUsers = [
   {
@@ -24,10 +25,22 @@ Page({
   },
 
   onLoad() {
+    // 应用主题颜色
+    const themeConfig = wx.getStorageSync('themeConfig');
+    if (themeConfig) {
+      app.globalData.themeConfig = themeConfig;
+      app.applyThemeConfig(themeConfig);
+    }
     this.loadUsers();
   },
 
   onShow() {
+    // 应用主题颜色
+    const themeConfig = wx.getStorageSync('themeConfig');
+    if (themeConfig) {
+      app.globalData.themeConfig = themeConfig;
+      app.applyThemeConfig(themeConfig);
+    }
     this.loadUsers();
   },
 

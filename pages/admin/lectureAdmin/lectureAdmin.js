@@ -1,4 +1,5 @@
 const data = require('../../../utils/data.js');
+const app = getApp();
 
 Page({
   data: {
@@ -6,10 +7,22 @@ Page({
   },
 
   onLoad() {
+    // 应用主题颜色
+    const themeConfig = wx.getStorageSync('themeConfig');
+    if (themeConfig) {
+      app.globalData.themeConfig = themeConfig;
+      app.applyThemeConfig(themeConfig);
+    }
     this.loadLectures();
   },
 
   onShow() {
+    // 应用主题颜色
+    const themeConfig = wx.getStorageSync('themeConfig');
+    if (themeConfig) {
+      app.globalData.themeConfig = themeConfig;
+      app.applyThemeConfig(themeConfig);
+    }
     this.loadLectures();
   },
 

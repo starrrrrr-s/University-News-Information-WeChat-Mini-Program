@@ -2,6 +2,8 @@ const util = require('../../utils/util.js');
 
 const BASE_URL = 'http://localhost:3001';
 
+const _themeColor = (wx.getStorageSync('themeConfig') || {}).primaryColor || '#1AAD19';
+
 Page({
   data: {
     bannerList: [],
@@ -12,6 +14,7 @@ Page({
     latestLimit: 10,
     latestHasMore: true,
     latestLoading: false,
+    themeColor: _themeColor,
 
     searchKeyword: '',
     searchMode: 'keyword',
@@ -39,6 +42,14 @@ Page({
   },
 
   onLoad() {
+    // 立即应用缓存的主题颜色，避免页面跳转时闪烁
+    const app = getApp();
+    const themeConfig = wx.getStorageSync('themeConfig');
+    if (themeConfig) {
+      app.globalData.themeConfig = themeConfig;
+      app.applyThemeConfig(themeConfig);
+      this.setData({ themeColor: themeConfig.primaryColor || '#1AAD19' });
+    }
     this.loadBanner();
     this.loadLatestNews(true);
     this.initYearList();
@@ -84,6 +95,13 @@ Page({
   },
 
   onShow() {
+    const app = getApp();
+    const themeConfig = wx.getStorageSync('themeConfig');
+    if (themeConfig) {
+      app.globalData.themeConfig = themeConfig;
+      app.applyThemeConfig(themeConfig);
+      this.setData({ themeColor: themeConfig.primaryColor || '#1AAD19' });
+    }
     this.loadBanner();
     this.loadLatestNews(true);
   },

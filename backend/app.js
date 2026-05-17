@@ -8,14 +8,16 @@ const categoryRoutes = require('./routes/category');
 const collectionRoutes = require('./routes/collection');
 const adminRoutes = require('./routes/admin');
 const commentRoutes = require('./routes/comment');
+const configRoutes = require('./routes/config');
 
-// 导入模型
 const User = require('./models/User');
 const Category = require('./models/Category');
 const News = require('./models/News');
 const Lecture = require('./models/Lecture');
 const Collection = require('./models/Collection');
 const Comment = require('./models/Comment');
+const AppConfig = require('./models/AppConfig');
+const configController = require('./controllers/configController');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -33,6 +35,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/collections', collectionRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/config', configRoutes);
 
 // 健康检查
 app.get('/api/health', (req, res) => {
@@ -60,8 +63,7 @@ const syncDatabase = async () => {
     const categories = [
       { id: 1, name: '立德树人' },
       { id: 2, name: '科技创新' },
-      { id: 3, name: '学术动态' },
-      { id: 4, name: '媒体地大' }
+      { id: 3, name: '媒体地大' }
     ];
 
     for (const category of categories) {
@@ -72,6 +74,8 @@ const syncDatabase = async () => {
     }
 
     console.log('初始化分类数据成功');
+
+    await configController.initDefaultConfig();
   } catch (error) {
     console.error('数据库初始化警告:', error.message);
   }

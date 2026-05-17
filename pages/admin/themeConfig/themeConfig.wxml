@@ -1,0 +1,36 @@
+<view class="theme-config" style="--theme-color: {{themeColor}}">
+  <view class="section-title">选择主题颜色</view>
+  
+  <view class="color-grid">
+    <view 
+      wx:for="{{presetColors}}" 
+      wx:key="color"
+      class="color-item {{selectedColor === item.color ? 'selected' : ''}}"
+      data-color="{{item.color}}"
+      bindtap="selectColor"
+    >
+      <view class="color-circle" style="background-color: {{item.color}}"></view>
+      <text class="color-name">{{item.name}}</text>
+    </view>
+  </view>
+
+  <view class="preview-section">
+    <view class="preview-title">预览效果</view>
+    <view class="preview-card">
+      <view class="preview-nav" style="background-color: {{selectedColor || currentColor}}">
+        <text style="color: white">导航栏</text>
+      </view>
+      <view class="preview-tabbar">
+        <view class="preview-tab" style="color: #999">首页</view>
+        <view class="preview-tab" style="color: {{selectedColor || currentColor}}">新闻</view>
+        <view class="preview-tab" style="color: #999">讲座</view>
+        <view class="preview-tab" style="color: #999">我的</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="action-section">
+    <button class="reset-btn" bindtap="resetToDefault">恢复默认</button>
+    <button class="apply-btn" bindtap="applyColor">应用主题</button>
+  </view>
+</view>

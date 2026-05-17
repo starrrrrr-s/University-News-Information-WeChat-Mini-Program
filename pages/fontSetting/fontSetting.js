@@ -1,3 +1,5 @@
+const app = getApp();
+
 const DEFAULT_FONT_SIZE = 30;
 const MIN_SIZE = 22;
 const MAX_SIZE = 42;
@@ -11,6 +13,12 @@ Page({
   },
 
   onLoad() {
+    // 应用主题颜色
+    const themeConfig = wx.getStorageSync('themeConfig');
+    if (themeConfig) {
+      app.globalData.themeConfig = themeConfig;
+      app.applyThemeConfig(themeConfig);
+    }
     wx.setNavigationBarTitle({ title: '字体设置' });
     const saved = wx.getStorageSync('fontSize');
     const fontSize = saved || DEFAULT_FONT_SIZE;

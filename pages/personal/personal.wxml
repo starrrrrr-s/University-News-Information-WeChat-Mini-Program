@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container" style="--theme-color: {{themeColor}}">
   <!-- 用户信息区域 -->
   <view class="user-section">
     <view class="user-info" wx:if="{{isLoggedIn}}">
@@ -59,7 +59,6 @@
       <text class="menu-icon">★</text>
       <text class="menu-text">我的收藏</text>
       <view class="menu-right">
-        <text class="menu-badge" wx:if="{{isLoggedIn && collectionsCount > 0}}">{{collectionsCount}}</text>
         <text class="menu-arrow">›</text>
       </view>
     </view>
@@ -106,6 +105,11 @@
     <view class="menu-item" bindtap="onAdminUser">
       <text class="menu-icon admin-icon">☺</text>
       <text class="menu-text">用户管理</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="onAdminTheme">
+      <text class="menu-icon admin-icon">🎨</text>
+      <text class="menu-text">主题配置</text>
       <text class="menu-arrow">›</text>
     </view>
   </view>

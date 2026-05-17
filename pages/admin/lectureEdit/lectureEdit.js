@@ -1,4 +1,5 @@
 const data = require('../../../utils/data.js');
+const app = getApp();
 
 Page({
   data: {
@@ -18,6 +19,12 @@ Page({
   },
 
   onLoad(options) {
+    // 应用主题颜色
+    const themeConfig = wx.getStorageSync('themeConfig');
+    if (themeConfig) {
+      app.globalData.themeConfig = themeConfig;
+      app.applyThemeConfig(themeConfig);
+    }
     if (options.id) {
       this.setData({ isEdit: true });
       this.loadLecture(parseInt(options.id));

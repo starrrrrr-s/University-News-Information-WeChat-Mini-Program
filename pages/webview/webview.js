@@ -1,9 +1,17 @@
+const app = getApp();
+
 Page({
   data: {
     url: ''
   },
 
   onLoad(options) {
+    // 应用主题颜色
+    const themeConfig = wx.getStorageSync('themeConfig');
+    if (themeConfig) {
+      app.globalData.themeConfig = themeConfig;
+      app.applyThemeConfig(themeConfig);
+    }
     if (options.url) {
       const url = decodeURIComponent(options.url);
       this.setData({ url });

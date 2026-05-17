@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container" style="--theme-color: {{themeColor}}">
   <swiper class="banner-swiper" indicator-dots="true" autoplay="true" interval="3000" duration="500" circular="true">
     <swiper-item wx:for="{{bannerList}}" wx:key="id" bindtap="onBannerTap" data-news-id="{{item.newsId}}">
       <view wx:if="{{item.image}}" class="banner-image-wrapper">

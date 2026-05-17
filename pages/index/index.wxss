@@ -95,7 +95,7 @@
 }
 
 .option-item.active {
-  background-color: #1AAD19;
+  background-color: var(--theme-color);
   color: #ffffff;
 }
 
@@ -171,7 +171,7 @@
 
 .dropdown-count {
   font-size: 24rpx;
-  color: #1AAD19;
+  color: var(--theme-color);
 }
 
 .loading-state {
@@ -290,7 +290,7 @@
 
 .page-btn {
   padding: 12rpx 24rpx;
-  background-color: #1AAD19;
+  background-color: var(--theme-color);
   color: #ffffff;
   border-radius: 24rpx;
   font-size: 26rpx;
@@ -336,7 +336,7 @@
 
 .more-link {
   font-size: 26rpx;
-  color: #1AAD19;
+  color: var(--theme-color);
 }
 
 .latest-loading {
@@ -465,7 +465,7 @@
 }
 
 .year-picker-item.selected {
-  background-color: #1AAD19;
+  background-color: var(--theme-color);
   color: #ffffff;
   font-weight: bold;
   border-radius: 32rpx;
@@ -473,7 +473,7 @@
 
 .year-picker-item.hover {
   background-color: #e8f5e9;
-  color: #1AAD19;
+  color: var(--theme-color);
   font-weight: bold;
   border-radius: 32rpx;
 }

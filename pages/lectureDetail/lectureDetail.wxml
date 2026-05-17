@@ -101,6 +101,10 @@
 
   <!-- 底部操作栏 -->
   <view class="action-bar" wx:if="{{lecture}}">
+    <button class="action-btn {{isCollected ? 'collected' : ''}}" bindtap="onToggleCollect">
+      <text class="action-icon">{{isCollected ? '★' : '☆'}}</text>
+      <text class="action-text">{{isCollected ? '已收藏' : '收藏'}}</text>
+    </button>
     <button class="action-btn comment-btn" bindtap="onFocusComment">
       <text class="action-icon">💬</text>
       <text class="action-text">写心得</text>

@@ -3,12 +3,15 @@ const app = getApp();
 
 const BASE_URL = 'http://localhost:3001';
 
+const _themeColor = (wx.getStorageSync('themeConfig') || {}).primaryColor || '#1AAD19';
+
 Page({
   data: {
     news: null,
     isCollected: false,
     isLoggedIn: false,
     fontSize: 30,
+    themeColor: _themeColor,
 
     commentList: [],
     commentTotal: 0,
@@ -34,7 +37,9 @@ Page({
 
   onShow() {
     const userInfo = app.globalData.userInfo;
-    this.setData({ isLoggedIn: !!userInfo });
+    const themeColor = app.getThemeColor();
+    this.setData({ isLoggedIn: !!userInfo, themeColor });
+    app.applyThemeConfig(app.globalData.themeConfig || wx.getStorageSync('themeConfig'));
     if (this.data.news) {
       this.checkCollectStatus(this.data.news.id);
       this.loadComments(true);

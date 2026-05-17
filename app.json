@@ -17,12 +17,13 @@
     "pages/admin/userAdmin/userAdmin",
     "pages/admin/commentAdmin/commentAdmin",
     "pages/admin/feedbackAdmin/feedbackAdmin",
+    "pages/admin/themeConfig/themeConfig",
     "pages/webview/webview"
   ],
   "window": {
-    "navigationBarTextStyle": "white",
+    "navigationBarTextStyle": "black",
     "navigationBarTitleText": "高校新闻资讯",
-    "navigationBarBackgroundColor": "#1AAD19",
+    "navigationBarBackgroundColor": "#ffffff",
     "backgroundColor": "#f8f8f8",
     "backgroundTextStyle": "light"
   },

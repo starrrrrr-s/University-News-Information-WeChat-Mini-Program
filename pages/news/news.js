@@ -2,6 +2,8 @@ const util = require('../../utils/util.js');
 
 const BASE_URL = 'http://localhost:3001';
 
+const _themeColor = (wx.getStorageSync('themeConfig') || {}).primaryColor || '#1AAD19';
+
 Page({
   data: {
     categoryList: [],
@@ -11,16 +13,31 @@ Page({
     page: 1,
     limit: 10,
     hasMore: true,
-    loading: false
+    loading: false,
+    themeColor: _themeColor
   },
 
   onLoad() {
+    // 立即应用缓存的主题颜色，避免页面跳转时闪烁
+    const app = getApp();
+    const themeConfig = wx.getStorageSync('themeConfig');
+    if (themeConfig) {
+      app.globalData.themeConfig = themeConfig;
+      app.applyThemeConfig(themeConfig);
+      this.setData({ themeColor: themeConfig.primaryColor || '#1AAD19' });
+    }
     this.loadCategories();
     this.loadNews();
   },
 
   onShow() {
-    // 只在首次加载时刷新，避免切回来重置已加载的列表
+    const app = getApp();
+    const themeConfig = wx.getStorageSync('themeConfig');
+    if (themeConfig) {
+      app.globalData.themeConfig = themeConfig;
+      app.applyThemeConfig(themeConfig);
+      this.setData({ themeColor: themeConfig.primaryColor || '#1AAD19' });
+    }
     if (this.data.newsList.length === 0) {
       this.loadNews(true);
     }

@@ -15,11 +15,9 @@
       <view class="tab-bar">
         <view class="tab-item {{activeTab === 0 ? 'active' : ''}}" bindtap="onTabChange" data-tab="0">
           <text>新闻收藏</text>
-          <text class="tab-count" wx:if="{{newsCollections.length > 0}}">{{newsCollections.length}}</text>
         </view>
         <view class="tab-item {{activeTab === 1 ? 'active' : ''}}" bindtap="onTabChange" data-tab="1">
           <text>讲座收藏</text>
-          <text class="tab-count" wx:if="{{lectureCollections.length > 0}}">{{lectureCollections.length}}</text>
         </view>
       </view>
       <view class="edit-btn" bindtap="onToggleEditMode">
@@ -56,8 +54,8 @@
           </view>
           <!-- 内容 -->
           <view class="item-body">
-            <view class="item-thumb" style="background-color: {{item.categoryColor}};">
-              <text class="thumb-text">{{item.category.charAt(0)}}</text>
+            <view class="item-thumb">
+              <text class="thumb-text">📰</text>
             </view>
             <view class="item-content">
               <view class="item-title">{{item.title}}</view>
@@ -101,8 +99,7 @@
             <view class="item-content">
               <view class="item-title">{{item.title}}</view>
               <view class="item-meta">
-                <text class="lecture-tag {{item.isFree ? 'free' : 'paid'}}">{{item.isFree ? '免费' : '收费'}}</text>
-                <text class="item-date">{{item.time}}</text>
+                <text class="item-date">{{item.start_time || item.time}}</text>
               </view>
               <view class="lecture-speaker">{{item.speaker}} · {{item.location}}</view>
             </view>

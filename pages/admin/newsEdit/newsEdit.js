@@ -1,5 +1,6 @@
 const util = require('../../../utils/util.js');
 const data = require('../../../utils/data.js');
+const app = getApp();
 
 const BASE_URL = 'http://localhost:3001';
 
@@ -23,6 +24,12 @@ Page({
   },
 
   onLoad(options) {
+    // 应用主题颜色
+    const themeConfig = wx.getStorageSync('themeConfig');
+    if (themeConfig) {
+      app.globalData.themeConfig = themeConfig;
+      app.applyThemeConfig(themeConfig);
+    }
     this.newsId = options.id || null;
     if (this.newsId) {
       this.setData({ isEdit: true });

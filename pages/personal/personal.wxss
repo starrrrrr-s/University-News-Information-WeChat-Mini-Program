@@ -1,5 +1,5 @@
 .user-section {
-  background: linear-gradient(135deg, #1AAD19, #0d8a0d);
+  background: linear-gradient(135deg, var(--theme-color), #0d8a0d);
   padding: 60rpx 30rpx 50rpx;
 }
 

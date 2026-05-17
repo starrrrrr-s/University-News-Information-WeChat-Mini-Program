@@ -1,4 +1,5 @@
 const data = require('../../utils/data.js');
+const util = require('../../utils/util.js');
 const app = getApp();
 
 const BASE_URL = 'http://localhost:3001';
@@ -6,7 +7,10 @@ const BASE_URL = 'http://localhost:3001';
 Page({
   data: {
     lecture: null,
-    fontSize: 28,  // 默认字体大小，从全局设置读取
+    fontSize: 28,
+
+    // 收藏相关
+    isCollected: false,
 
     // 评论相关
     commentList: [],
@@ -35,7 +39,14 @@ Page({
   onShow() {
     const fontSize = wx.getStorageSync('fontSize') || 28;
     this.setData({ fontSize });
-    // 每次页面显示时重新加载评论，确保评论列表是最新的
+    
+    const app = getApp();
+    const themeConfig = wx.getStorageSync('themeConfig');
+    if (themeConfig) {
+      app.globalData.themeConfig = themeConfig;
+      app.applyThemeConfig(themeConfig);
+    }
+    
     if (this.data.lecture) {
       this.loadComments(true);
     }
@@ -49,7 +60,8 @@ Page({
       success: (res) => {
         if (res.data && res.data.success) {
           const lecture = res.data.data;
-          this.setData({ lecture });
+          const isCollected = util.isLectureCollected(lecture.id);
+          this.setData({ lecture, isCollected });
           wx.setNavigationBarTitle({ title: lecture.title });
           this.loadComments(true);
         } else {
@@ -152,6 +164,46 @@ Page({
       return;
     }
     this.setData({ showCommentInput: true, commentInputFocus: true });
+  },
+
+  onToggleCollect() {
+    const lecture = this.data.lecture;
+    if (!lecture) return;
+
+    if (!app.globalData.userInfo) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再收藏',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.switchTab({ url: '/pages/personal/personal' });
+          }
+        }
+      });
+      return;
+    }
+
+    if (this.data.isCollected) {
+      util.removeLectureFromCollection(lecture.id);
+      this.setData({ isCollected: false });
+      wx.showToast({ title: '已取消收藏', icon: 'success' });
+    } else {
+      const lectureToSave = {
+        id: lecture.id,
+        title: lecture.title,
+        speaker: lecture.speaker,
+        speakerTitle: lecture.speakerTitle,
+        start_time: lecture.start_time || lecture.time,
+        location: lecture.location,
+        organizer: lecture.organizer,
+        category: lecture.category,
+        image: lecture.image
+      };
+      util.addLectureToCollection(lectureToSave);
+      this.setData({ isCollected: true });
+      wx.showToast({ title: '收藏成功', icon: 'success' });
+    }
   },
 
   onReply(e) {
