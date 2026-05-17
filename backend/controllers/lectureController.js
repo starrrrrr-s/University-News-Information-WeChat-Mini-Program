@@ -8,7 +8,7 @@ const getLectureList = async (req, res) => {
     const offset = (page - 1) * limit;
 
     const { count, rows } = await Lecture.findAndCountAll({
-      order: [['time', 'ASC']],
+      order: [['start_time', 'ASC']],
       limit: parseInt(limit),
       offset: parseInt(offset)
     });
@@ -40,22 +40,27 @@ const getLectureDetail = async (req, res) => {
 // 新增讲座
 const createLecture = async (req, res) => {
   try {
-    const { title, content, speaker, speaker_title, location, time, organizer, category, is_free } = req.body;
+    const { title, content, speaker, speaker_title, location, start_time, end_time, organizer, category, is_free, link, max_participants } = req.body;
 
-    if (!title || !content || !speaker || !location || !time || !organizer || !category) {
+    if (!title || !speaker || !location || !start_time || !organizer) {
       return error(res, '缺少必要参数');
     }
 
     const lecture = await Lecture.create({
       title,
-      content,
+      content: content || '',
       speaker,
       speaker_title,
       location,
-      time,
+      start_time,
+      end_time,
       organizer,
-      category,
-      is_free
+      category: category || '学术讲座',
+      is_free: is_free !== undefined ? is_free : 1,
+      link,
+      max_participants: max_participants || 0,
+      current_participants: 0,
+      is_published: 1
     });
 
     return success(res, lecture, '新增讲座成功');
@@ -69,7 +74,7 @@ const createLecture = async (req, res) => {
 const updateLecture = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, content, speaker, speaker_title, location, time, organizer, category, is_free } = req.body;
+    const { title, content, speaker, speaker_title, location, start_time, end_time, organizer, category, is_free, link, max_participants, is_published } = req.body;
 
     const lecture = await Lecture.findByPk(id);
     if (!lecture) {
@@ -77,15 +82,19 @@ const updateLecture = async (req, res) => {
     }
 
     await lecture.update({
-      title: title || lecture.title,
-      content: content || lecture.content,
-      speaker: speaker || lecture.speaker,
-      speaker_title: speaker_title || lecture.speaker_title,
-      location: location || lecture.location,
-      time: time || lecture.time,
-      organizer: organizer || lecture.organizer,
-      category: category || lecture.category,
-      is_free: is_free !== undefined ? is_free : lecture.is_free
+      title: title !== undefined ? title : lecture.title,
+      content: content !== undefined ? content : lecture.content,
+      speaker: speaker !== undefined ? speaker : lecture.speaker,
+      speaker_title: speaker_title !== undefined ? speaker_title : lecture.speaker_title,
+      location: location !== undefined ? location : lecture.location,
+      start_time: start_time !== undefined ? start_time : lecture.start_time,
+      end_time: end_time !== undefined ? end_time : lecture.end_time,
+      organizer: organizer !== undefined ? organizer : lecture.organizer,
+      category: category !== undefined ? category : lecture.category,
+      is_free: is_free !== undefined ? is_free : lecture.is_free,
+      link: link !== undefined ? link : lecture.link,
+      max_participants: max_participants !== undefined ? max_participants : lecture.max_participants,
+      is_published: is_published !== undefined ? is_published : lecture.is_published
     });
 
     return success(res, lecture, '更新讲座成功');
