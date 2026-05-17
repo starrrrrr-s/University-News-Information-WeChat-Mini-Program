@@ -225,7 +225,7 @@ const searchNews = async (req, res) => {
 
 const createNews = async (req, res) => {
   try {
-    const { title, content, summary, category_id, author, image_url, published_at } = req.body;
+    const { title, content, summary, category_id, author, image_url, source_url, published_at } = req.body;
 
     if (!title || !content || !category_id || !author) {
       return error(res, '缺少必要参数');
@@ -238,6 +238,7 @@ const createNews = async (req, res) => {
       category_id,
       author,
       image_url,
+      source_url,
       published_at: published_at || new Date()
     });
 
@@ -251,7 +252,7 @@ const createNews = async (req, res) => {
 const updateNews = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, content, summary, category_id, author, image_url, published_at } = req.body;
+    const { title, content, summary, category_id, author, image_url, source_url, published_at } = req.body;
 
     const news = await News.findByPk(id);
     if (!news) {
@@ -264,7 +265,8 @@ const updateNews = async (req, res) => {
       summary: summary || news.summary,
       category_id: category_id || news.category_id,
       author: author || news.author,
-      image_url: image_url || news.image_url,
+      image_url: image_url !== undefined ? image_url : news.image_url,
+      source_url: source_url !== undefined ? source_url : news.source_url,
       published_at: published_at || news.published_at
     });
 
