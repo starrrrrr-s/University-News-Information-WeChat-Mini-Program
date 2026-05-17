@@ -8,7 +8,7 @@ async function updateAdmin() {
     connection = await mysql.createConnection({
       host: 'localhost',
       user: 'root',
-      password: 'csbt34.ydhl12s',
+      password: '2003',
       database: 'campus_news'
     });
 

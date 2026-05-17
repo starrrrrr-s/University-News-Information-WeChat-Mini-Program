@@ -10,6 +10,9 @@ router.get('/', newsController.getNewsList);
 // 获取最新新闻
 router.get('/latest', newsController.getLatestNews);
 
+// 搜索新闻（必须在 /:id 之前注册）
+router.get('/search', newsController.searchNews);
+
 // 获取新闻详情
 router.get('/:id', newsController.getNewsDetail);
 

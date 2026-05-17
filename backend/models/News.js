@@ -30,6 +30,9 @@ const News = sequelize.define('News', {
   image_url: {
     type: DataTypes.TEXT
   },
+  source_url: {
+    type: DataTypes.TEXT
+  },
   views: {
     type: DataTypes.INTEGER,
     defaultValue: 0

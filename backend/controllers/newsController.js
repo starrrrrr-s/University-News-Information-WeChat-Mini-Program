@@ -36,6 +36,7 @@ const getNewsList = async (req, res) => {
         author: news.author,
         image: imageUrl,
         image_url: imageUrl,
+        source_url: news.source_url || '',
         date: news.published_at ? formatDate(news.published_at) : formatDate(news.created_at),
         views: news.views || 0,
         published_at: news.published_at,
@@ -79,6 +80,7 @@ const getNewsDetail = async (req, res) => {
       author: news.author,
       image: imageUrl,
       image_url: imageUrl,
+      source_url: news.source_url || '',
       date: news.published_at ? formatDate(news.published_at) : formatDate(news.created_at),
       views: news.views || 0,
       published_at: news.published_at,
@@ -116,6 +118,7 @@ const getLatestNews = async (req, res) => {
         author: item.author,
         image: imageUrl,
         image_url: imageUrl,
+        source_url: item.source_url || '',
         date: item.published_at ? formatDate(item.published_at) : formatDate(item.created_at),
         views: item.views || 0
       };
@@ -130,76 +133,90 @@ const getLatestNews = async (req, res) => {
 
 const searchNews = async (req, res) => {
   try {
-    const { keyword, searchTime = true, searchKeyword = true, searchCategory = true } = req.query;
+    const { keyword, page = 1, pageSize = 10 } = req.query;
 
     if (!keyword) {
       return error(res, '请输入搜索关键词');
     }
 
-    const where = {
-      [Op.or]: []
-    };
+    const limit = parseInt(pageSize);
+    const offset = (parseInt(page) - 1) * limit;
 
-    if (searchKeyword) {
-      where[Op.or].push(
-        { title: { [Op.like]: `%${keyword}%` } },
-        { content: { [Op.like]: `%${keyword}%` } },
-        { summary: { [Op.like]: `%${keyword}%` } }
-      );
+    let where = {};
+
+    // 判断是否为日期格式搜索
+    const isFullDate = /^\d{4}-\d{2}-\d{2}$/.test(keyword);   // 2025-05-16
+    const isYearMonth = /^\d{4}-\d{2}$/.test(keyword);         // 2025-05
+    const isYear = /^\d{4}$/.test(keyword);                    // 2025
+
+    if (isFullDate) {
+      // 精确到天：当天 00:00:00 ~ 23:59:59
+      const start = new Date(`${keyword}T00:00:00`);
+      const end = new Date(`${keyword}T23:59:59`);
+      where = {
+        [Op.or]: [
+          { published_at: { [Op.between]: [start, end] } },
+          { created_at: { [Op.between]: [start, end] } }
+        ]
+      };
+    } else if (isYearMonth) {
+      // 精确到月
+      const [y, m] = keyword.split('-').map(Number);
+      const start = new Date(y, m - 1, 1);
+      const end = new Date(y, m, 1);
+      where = {
+        [Op.or]: [
+          { published_at: { [Op.gte]: start, [Op.lt]: end } },
+          { created_at: { [Op.gte]: start, [Op.lt]: end } }
+        ]
+      };
+    } else if (isYear) {
+      // 精确到年
+      const y = parseInt(keyword);
+      const start = new Date(y, 0, 1);
+      const end = new Date(y + 1, 0, 1);
+      where = {
+        [Op.or]: [
+          { published_at: { [Op.gte]: start, [Op.lt]: end } },
+          { created_at: { [Op.gte]: start, [Op.lt]: end } }
+        ]
+      };
+    } else {
+      // 关键词搜索：仅匹配标题
+      where = {
+        title: { [Op.like]: `%${keyword}%` }
+      };
     }
 
-    if (searchCategory) {
-      const categories = await Category.findAll({
-        where: { name: { [Op.like]: `%${keyword}%` } },
-        attributes: ['id']
-      });
-      const categoryIds = categories.map(c => c.id);
-      if (categoryIds.length > 0) {
-        where[Op.or].push({ category_id: { [Op.in]: categoryIds } });
-      }
-    }
-
-    if (searchTime) {
-      const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-      where[Op.or].push(
-        { published_at: { [Op.gte]: threeDaysAgo } },
-        { created_at: { [Op.gte]: threeDaysAgo } }
-      );
-    }
-
-    if (where[Op.or].length === 0) {
-      return success(res, [], '搜索成功');
-    }
-
-    const news = await News.findAll({
+    const { count, rows } = await News.findAndCountAll({
       where,
       include: [{ model: Category, attributes: ['id', 'name'] }],
-      order: [['published_at', 'DESC'], ['created_at', 'DESC']]
+      order: [['published_at', 'DESC'], ['created_at', 'DESC']],
+      limit,
+      offset
     });
 
-    const newsList = news.map(item => {
+    const newsList = rows.map(item => {
       const category = item.Category || { id: item.category_id, name: '未分类' };
-      const imageUrl = item.image_url ? 
+      const imageUrl = item.image_url ?
         (item.image_url.startsWith('http') ? item.image_url : `http://localhost:3000${item.image_url}`) : null;
-      
+
       return {
         id: item.id,
         title: item.title,
         summary: item.summary || item.content.substring(0, 100) + '...',
-        content: item.content,
         category: category.name,
         categoryId: category.id,
         author: item.author,
         image: imageUrl,
         image_url: imageUrl,
+        source_url: item.source_url || '',
         date: item.published_at ? formatDate(item.published_at) : formatDate(item.created_at),
-        views: item.views || 0,
-        published_at: item.published_at,
-        created_at: item.created_at
+        views: item.views || 0
       };
     });
 
-    return success(res, newsList, '搜索成功');
+    return paginate(res, newsList, count, parseInt(page), limit);
   } catch (err) {
     console.error('搜索新闻失败:', err);
     return error(res, '搜索新闻失败');

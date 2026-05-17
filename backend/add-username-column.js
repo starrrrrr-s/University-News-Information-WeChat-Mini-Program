@@ -6,7 +6,7 @@ async function addUsernameColumn() {
     connection = await mysql.createConnection({
       host: 'localhost',
       user: 'root',
-      password: 'yql15008135542',
+      password: '2003',
       database: 'campus_news'
     });
 

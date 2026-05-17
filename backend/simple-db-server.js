@@ -76,7 +76,8 @@ app.get('/api/news/latest', (req, res) => {
       image: images[0] || null,
       images: images,
       date: item.published_at ? formatDate(item.published_at) : formatDate(item.created_at),
-      views: item.views || 0
+      views: item.views || 0,
+      sourceUrl: item.source_url || null
     };
   });
 
@@ -227,7 +228,8 @@ app.get('/api/news/search', (req, res) => {
       image: images[0] || null,
       images: images,
       date: item.published_at ? formatDate(item.published_at) : formatDate(item.created_at),
-      views: item.views || 0
+      views: item.views || 0,
+      sourceUrl: item.source_url || null
     };
   });
 
@@ -301,7 +303,8 @@ app.get('/api/news/:id', (req, res) => {
       image: images[0] || null,
       images: images,
       date: item.published_at ? formatDate(item.published_at) : formatDate(item.created_at),
-      views: item.views || 0
+      views: item.views || 0,
+      sourceUrl: item.source_url || null
     }
   });
 });
