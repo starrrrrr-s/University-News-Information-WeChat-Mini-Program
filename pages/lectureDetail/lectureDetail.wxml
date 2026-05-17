@@ -21,7 +21,7 @@
         </view>
         <view class="info-row">
           <text class="label">时间：</text>
-          <text class="value">{{lecture.time}}</text>
+          <text class="value">{{lecture.start_time || lecture.time}}</text>
         </view>
         <view class="info-row">
           <text class="label">地点：</text>
@@ -40,6 +40,17 @@
       <view class="detail-section">
         <view class="section-title">讲座内容</view>
         <view class="detail-content" style="font-size: {{fontSize}}rpx;">{{lecture.content}}</view>
+      </view>
+
+      <!-- 讲座链接 -->
+      <view class="detail-section" wx:if="{{lecture.link}}">
+        <view class="section-title">查看原文</view>
+        <view class="link-section">
+          <view class="link-btn" bindtap="openLink">
+            <text class="link-icon">🔗</text>
+            <text class="link-text">点击打开链接</text>
+          </view>
+        </view>
       </view>
 
       <!-- 评论区 -->

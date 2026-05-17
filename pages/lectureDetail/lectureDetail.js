@@ -322,7 +322,7 @@ Page({
 
     // 构建分享标题，包含时间地点等关键信息
     // 格式：【讲座】标题 | 时间 | 地点
-    const timeStr = this.formatLectureTime(lecture.time);
+    const timeStr = this.formatLectureTime(lecture.start_time || lecture.time);
     const location = lecture.location || '';
     
     let shareTitle = `【讲座】${lecture.title}`;
@@ -357,7 +357,7 @@ Page({
     }
 
     // 构建分享标题，包含时间地点信息
-    const timeStr = this.formatLectureTime(lecture.time);
+    const timeStr = this.formatLectureTime(lecture.start_time || lecture.time);
     const location = lecture.location || '';
     
     let shareTitle = `【讲座】${lecture.title}`;
@@ -376,5 +376,27 @@ Page({
       query: `id=${lecture.id}`,
       imageUrl: lecture.image || ''
     };
+  },
+
+  // 打开讲座链接
+  openLink() {
+    const lecture = this.data.lecture;
+    if (!lecture || !lecture.link) {
+      wx.showToast({ title: '链接不存在', icon: 'none' });
+      return;
+    }
+
+    // 使用web-view打开链接（需要跳转到专门的web-view页面）
+    // 或者复制链接到剪贴板
+    wx.setClipboardData({
+      data: lecture.link,
+      success: () => {
+        wx.showModal({
+          title: '提示',
+          content: '链接已复制到剪贴板，请在浏览器中打开',
+          showCancel: false
+        });
+      }
+    });
   }
 });
