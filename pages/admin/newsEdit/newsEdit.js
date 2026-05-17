@@ -14,6 +14,8 @@ Page({
     date: '',
     summary: '',
     content: '',
+    sourceUrl: '',
+    imageUrl: '',
     categoryList: [],
     isTimedPublish: false,
     publishTime: '',
@@ -93,6 +95,8 @@ Page({
             date: news.date,
             summary: news.summary,
             content: news.content,
+            sourceUrl: news.source_url || '',
+            imageUrl: news.image_url || '',
             isTimedPublish: news.isTimed || false,
             publishDate: news.date || '',
             publishTime: publishTime
@@ -136,6 +140,14 @@ Page({
     this.setData({ content: e.detail.value });
   },
 
+  onSourceUrlInput(e) {
+    this.setData({ sourceUrl: e.detail.value });
+  },
+
+  onImageUrlInput(e) {
+    this.setData({ imageUrl: e.detail.value });
+  },
+
   onTimedPublishChange(e) {
     this.setData({ isTimedPublish: e.detail.value });
   },
@@ -149,7 +161,7 @@ Page({
   },
 
   onSave() {
-    const { title, categoryId, author, date, summary, content, isTimedPublish, publishDate, publishTime } = this.data;
+    const { title, categoryId, author, date, summary, content, sourceUrl, imageUrl, isTimedPublish, publishDate, publishTime } = this.data;
 
     if (!title.trim()) {
       wx.showToast({ title: '请输入标题', icon: 'none' });
@@ -182,6 +194,8 @@ Page({
       author: author.trim(),
       summary: summary.trim(),
       content: content.trim(),
+      source_url: sourceUrl.trim(),
+      image_url: imageUrl.trim(),
       published_at: isTimedPublish ? `${publishDate} ${publishTime}` : date
     };
 

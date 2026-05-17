@@ -68,6 +68,16 @@
       <text class="form-label required">正文内容</text>
       <textarea class="form-textarea content" placeholder="请输入新闻正文内容" value="{{content}}" bindinput="onContentInput" maxlength="5000" />
     </view>
+
+    <view class="form-item">
+      <text class="form-label">来源URL</text>
+      <input class="form-input" placeholder="请输入新闻来源链接（可选）" value="{{sourceUrl}}" bindinput="onSourceUrlInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">图片URL</text>
+      <input class="form-input" placeholder="请输入新闻封面图片链接（可选）" value="{{imageUrl}}" bindinput="onImageUrlInput" />
+    </view>
   </view>
 
   <view class="form-actions">
