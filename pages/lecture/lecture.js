@@ -1,5 +1,7 @@
 const data = require('../../utils/data.js');
 
+const BASE_URL = 'http://localhost:3001';
+
 Page({
   data: {
     lectureList: [],
@@ -30,8 +32,33 @@ Page({
   },
 
   loadLectures() {
-    const lectures = data.getLectureList();
-    this.setData({ lectureList: lectures });
+    wx.showLoading({ title: '加载中...' });
+    wx.request({
+      url: `${BASE_URL}/api/lectures`,
+      method: 'GET',
+      success: (res) => {
+        if (res.data && res.data.success) {
+          const lectures = (res.data.data || []).map(item => ({
+            ...item,
+            time: item.start_time || item.time,
+            isFree: item.is_free !== undefined ? item.is_free : true
+          }));
+          this.setData({ lectureList: lectures });
+        } else {
+          // 后端失败时使用本地数据
+          const lectures = data.getLectureList();
+          this.setData({ lectureList: lectures });
+        }
+      },
+      fail: () => {
+        // 后端不可用时使用本地数据
+        const lectures = data.getLectureList();
+        this.setData({ lectureList: lectures });
+      },
+      complete: () => {
+        wx.hideLoading();
+      }
+    });
   },
 
   onLectureTap(e) {
