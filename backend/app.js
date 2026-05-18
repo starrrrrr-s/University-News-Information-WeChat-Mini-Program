@@ -9,6 +9,7 @@ const categoryRoutes = require('./routes/category');
 const collectionRoutes = require('./routes/collection');
 const adminRoutes = require('./routes/admin');
 const commentRoutes = require('./routes/comment');
+const configRoutes = require('./routes/config');
 
 // 导入模型
 const User = require('./models/User');
@@ -34,6 +35,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/collections', collectionRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/config', configRoutes);
 
 // 健康检查
 app.get('/api/health', (req, res) => {
