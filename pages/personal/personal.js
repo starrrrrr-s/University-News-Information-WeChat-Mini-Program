@@ -15,7 +15,19 @@ Page({
     loginType: 'wechat',
     adminUsername: '',
     adminPassword: '',
-    themeColor: _themeColor
+    themeColor: _themeColor,
+    // 编辑资料相关
+    showEditModal: false,
+    editNickname: '',
+    editAvatar: '',
+    avatarList: [
+      'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="45" fill="%23FF6B6B"/%3E%3Ctext x="50" y="60" text-anchor="middle" font-size="40"%3E%E2%98%80%3C/text%3E%3C/svg%3E',
+      'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="45" fill="%234ECDC4"/%3E%3Ctext x="50" y="60" text-anchor="middle" font-size="40"%3E%E2%98%81%3C/text%3E%3C/svg%3E',
+      'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="45" fill="%2345B7D1"/%3E%3Ctext x="50" y="60" text-anchor="middle" font-size="40"%3E%E2%99%A6%3C/text%3E%3C/svg%3E',
+      'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="45" fill="%23FFA07A"/%3E%3Ctext x="50" y="60" text-anchor="middle" font-size="40"%3E%F0%9F%A6%8A%3C/text%3E%3C/svg%3E',
+      'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="45" fill="%2398D8C8"/%3E%3Ctext x="50" y="60" text-anchor="middle" font-size="40"%3E%F0%9F%90%83%3C/text%3E%3C/svg%3E'
+    ],
+    avatarNames: ['熊', '猫', '狗', '狐狸', '兔子']
   },
 
   onLoad() {
@@ -161,18 +173,31 @@ Page({
             wx.request({
               url: `${BASE_URL}/api/auth/login`,
               method: 'POST',
-              data: { code: loginRes.code },
+              data: {
+                code: loginRes.code,
+                nickname: profileRes.userInfo.nickName,
+                avatar_url: profileRes.userInfo.avatarUrl
+              },
               success: (authRes) => {
                 let token = '';
                 let isAdmin = false;
+                let nickName = profileRes.userInfo.nickName;
+                let avatarUrl = profileRes.userInfo.avatarUrl;
                 if (authRes.data && authRes.data.success) {
                   token = authRes.data.data.token;
                   isAdmin = authRes.data.data.user.is_admin || false;
+                  // 使用后端返回的用户信息（包含修改后的昵称和头像）
+                  if (authRes.data.data.user.nickname) {
+                    nickName = authRes.data.data.user.nickname;
+                  }
+                  if (authRes.data.data.user.avatar_url) {
+                    avatarUrl = authRes.data.data.user.avatar_url;
+                  }
                   wx.setStorageSync('token', token);
                 }
                 const userInfo = {
-                  nickName: profileRes.userInfo.nickName,
-                  avatarUrl: profileRes.userInfo.avatarUrl,
+                  nickName,
+                  avatarUrl,
                   isAdmin
                 };
                 app.globalData.userInfo = userInfo;
@@ -292,5 +317,85 @@ Page({
 
   onAbout() {
     wx.navigateTo({ url: '/pages/about/about' });
+  },
+
+  // 显示编辑资料弹窗
+  showEditModal() {
+    const { userInfo } = this.data;
+    this.setData({
+      showEditModal: true,
+      editNickname: userInfo.nickName || '',
+      editAvatar: userInfo.avatarUrl || ''
+    });
+  },
+
+  // 隐藏编辑资料弹窗
+  hideEditModal() {
+    this.setData({ showEditModal: false });
+  },
+
+  // 阻止弹窗内容区域点击事件冒泡
+  onEditModalTap() {
+    // 空方法，阻止事件冒泡
+  },
+
+  // 昵称输入
+  onEditNicknameInput(e) {
+    this.setData({ editNickname: e.detail.value });
+  },
+
+  // 选择头像
+  selectAvatar(e) {
+    const avatar = e.currentTarget.dataset.avatar;
+    this.setData({ editAvatar: avatar });
+  },
+
+  // 保存用户信息
+  saveUserInfo() {
+    const { editNickname, editAvatar } = this.data;
+    
+    if (!editNickname.trim()) {
+      wx.showToast({ title: '请输入昵称', icon: 'none' });
+      return;
+    }
+
+    const token = wx.getStorageSync('token');
+    if (!token) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
+
+    wx.request({
+      url: `${BASE_URL}/api/auth/user`,
+      method: 'PUT',
+      header: {
+        'Authorization': `Bearer ${token}`
+      },
+      data: {
+        nickname: editNickname.trim(),
+        avatar_url: editAvatar
+      },
+      success: (res) => {
+        if (res.data && res.data.success) {
+          const userInfo = {
+            nickName: res.data.data.nickname,
+            avatarUrl: res.data.data.avatar_url || '',
+            isAdmin: this.data.isAdmin
+          };
+          app.globalData.userInfo = userInfo;
+          wx.setStorageSync('userInfo', userInfo);
+          this.setData({
+            userInfo,
+            showEditModal: false
+          });
+          wx.showToast({ title: '修改成功', icon: 'success' });
+        } else {
+          wx.showToast({ title: res.data.message || '修改失败', icon: 'none' });
+        }
+      },
+      fail: () => {
+        wx.showToast({ title: '修改失败，请重试', icon: 'none' });
+      }
+    });
   }
 });

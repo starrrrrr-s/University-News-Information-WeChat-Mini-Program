@@ -8,6 +8,9 @@
       </view>
       <text class="nickname">{{userInfo.nickName}}</text>
       <view class="user-badge" wx:if="{{isAdmin}}">管理员</view>
+      <view class="edit-btn" bindtap="showEditModal">
+        <text class="edit-icon">✎</text>
+      </view>
     </view>
     <view class="login-prompt" wx:else>
       <view class="login-modal" wx:if="{{showLoginModal}}" catchtap="hideLoginModal">
@@ -122,5 +125,38 @@
   <!-- 版本信息 -->
   <view class="version-info">
     <text>高校新闻资讯 v1.0.0</text>
+  </view>
+
+  <!-- 编辑资料弹窗 -->
+  <view class="edit-modal" wx:if="{{showEditModal}}" catchtap="hideEditModal">
+    <view class="edit-modal-content" catchtap="onEditModalTap">
+      <view class="edit-modal-header">
+        <text class="edit-modal-title">编辑资料</text>
+        <text class="edit-modal-close" bindtap="hideEditModal">×</text>
+      </view>
+      <view class="edit-form">
+        <!-- 昵称输入 -->
+        <view class="form-item">
+          <text class="form-label">昵称</text>
+          <input class="form-input" placeholder="请输入昵称" value="{{editNickname}}" bindinput="onEditNicknameInput" />
+        </view>
+        <!-- 头像选择 -->
+        <view class="form-item">
+          <text class="form-label">选择头像</text>
+          <view class="avatar-selector">
+            <view class="avatar-option" wx:for="{{avatarList}}" wx:key="index" bindtap="selectAvatar" data-avatar="{{item}}">
+              <image class="avatar-preview" src="{{item}}" mode="aspectFill" />
+              <view class="avatar-check" wx:if="{{editAvatar === item}}">
+                <text>✓</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="edit-modal-footer">
+        <button class="cancel-btn" bindtap="hideEditModal">取消</button>
+        <button class="save-btn" bindtap="saveUserInfo">保存</button>
+      </view>
+    </view>
   </view>
 </view>
