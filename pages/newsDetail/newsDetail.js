@@ -3,15 +3,12 @@ const app = getApp();
 
 const BASE_URL = 'http://localhost:3001';
 
-const _themeColor = (wx.getStorageSync('themeConfig') || {}).primaryColor || '#1AAD19';
-
 Page({
   data: {
     news: null,
     isCollected: false,
     isLoggedIn: false,
     fontSize: 30,
-    themeColor: _themeColor,
 
     commentList: [],
     commentTotal: 0,
@@ -23,12 +20,39 @@ Page({
     showCommentInput: false,
     commentInputFocus: false,
     commentContent: '',
-    replyTo: null
+    replyTo: null,
+
+    // AI 相关
+    aiLoading: false,
+    aiError: '',
+    aiData: {},
+
+    // 语音朗读相关
+    isSpeaking: false,
+    speakMode: '',
+    innerAudioContext: null,
+    ttsMode: 'real', // 'real' 真实 TTS，'mock' 模拟
+    currentVoice: 'Neil', // Neil, Ethan, Serena, Bellona
+    showVoiceSelector: false
   },
 
   onLoad(options) {
     const fontSize = wx.getStorageSync('fontSize') || 30;
     this.setData({ fontSize });
+
+    // 初始化语音播放器
+    const innerAudioContext = wx.createInnerAudioContext();
+    this.setData({ innerAudioContext });
+
+    innerAudioContext.onEnded(() => {
+      this.setData({ isSpeaking: false, speakMode: '' });
+    });
+
+    innerAudioContext.onError((err) => {
+      console.error('语音播放错误:', err);
+      this.setData({ isSpeaking: false, speakMode: '' });
+      wx.showToast({ title: '语音播放失败', icon: 'none' });
+    });
 
     if (options.id) {
       this.loadNews(options.id);
@@ -37,9 +61,7 @@ Page({
 
   onShow() {
     const userInfo = app.globalData.userInfo;
-    const themeColor = app.getThemeColor();
-    this.setData({ isLoggedIn: !!userInfo, themeColor });
-    app.applyThemeConfig(app.globalData.themeConfig || wx.getStorageSync('themeConfig'));
+    this.setData({ isLoggedIn: !!userInfo });
     if (this.data.news) {
       this.checkCollectStatus(this.data.news.id);
       this.loadComments(true);
@@ -75,6 +97,14 @@ Page({
           this.checkCollectStatus(news.id);
           wx.setNavigationBarTitle({ title: news.title });
           this.loadComments(true);
+          // 自动获取 AI 要点提炼
+          if (newsWithColor.sourceUrl) {
+            this.onExtractContent();
+          }
+          // 自动获取 AI 要点提炼
+          if (newsWithColor.sourceUrl) {
+            this.onExtractContent();
+          }
         } else {
           wx.showToast({ title: '新闻不存在', icon: 'none' });
         }
@@ -416,6 +446,237 @@ Page({
         wx.showToast({ title: '预览失败', icon: 'none' });
       }
     });
+  },
+
+  // AI：提取内容
+  onExtractContent() {
+    const news = this.data.news;
+    if (!news || !news.sourceUrl) {
+      wx.showToast({ title: '暂无原文链接', icon: 'none' });
+      return;
+    }
+
+    this.setData({ aiLoading: true, aiError: '' });
+
+    wx.request({
+      url: `${BASE_URL}/api/news/extract-content`,
+      method: 'POST',
+      data: {
+        url: news.sourceUrl,
+        newsId: news.id
+      },
+      success: (res) => {
+        if (res.data && res.data.success) {
+          this.setData({
+            aiLoading: false,
+            aiData: res.data.data
+          });
+        } else {
+          this.setData({
+            aiLoading: false,
+            aiError: res.data.message || '获取失败'
+          });
+        }
+      },
+      fail: () => {
+        this.setData({ aiLoading: false });
+        this.extractLocalContent(news);
+      }
+    });
+  },
+
+  // 本地内容提取（降级方案）
+  extractLocalContent(news) {
+    const keyPoints = [];
+    
+    if (news.date) keyPoints.push({ type: 'time', text: `时间：${news.date}` });
+    if (news.author) keyPoints.push({ type: 'person', text: `作者：${news.author}` });
+    if (news.summary) {
+      keyPoints.push({ type: 'content', text: news.summary });
+    } else if (news.content) {
+      keyPoints.push({ type: 'content', text: news.content.substring(0, 100) + '...' });
+    }
+    
+    if (keyPoints.length === 0) {
+      keyPoints.push({ type: 'info', text: '请查看原文了解更多详情' });
+    }
+
+    this.setData({
+      aiData: {
+        keyPoints,
+        summary: news.summary || news.content.substring(0, 150) + '...',
+        content: news.content || ''
+      }
+    });
+  },
+
+  // 语音：朗读要点
+  onSpeakKeyPoints() {
+    const { aiData, isSpeaking, speakMode } = this.data;
+    if (!aiData.keyPoints || aiData.keyPoints.length === 0) {
+      wx.showToast({ title: '暂无要点可朗读', icon: 'none' });
+      return;
+    }
+
+    if (isSpeaking && speakMode === 'keyPoints') {
+      this.stopSpeaking();
+      return;
+    }
+
+    if (isSpeaking) {
+      this.stopSpeaking();
+    }
+
+    const speakText = aiData.keyPoints.map(kp => kp.text).join('。');
+    this.startSpeaking(speakText, 'keyPoints');
+  },
+
+  // 语音：朗读全文
+  onSpeakFullText() {
+    const { aiData, news, isSpeaking, speakMode } = this.data;
+    const fullText = aiData.content || (news && news.content);
+    
+    if (!fullText) {
+      wx.showToast({ title: '暂无内容可朗读', icon: 'none' });
+      return;
+    }
+
+    if (isSpeaking && speakMode === 'fullText') {
+      this.stopSpeaking();
+      return;
+    }
+
+    if (isSpeaking) {
+      this.stopSpeaking();
+    }
+
+    this.startSpeaking(fullText, 'fullText');
+  },
+
+  // 开始语音朗读
+  startSpeaking(text, mode) {
+    if (this.data.ttsMode === 'real') {
+      this.startRealTTS(text, mode);
+    } else {
+      this.startMockSpeaking(text, mode);
+    }
+  },
+
+  // 真实 TTS 朗读
+  startRealTTS(text, mode) {
+    this.setData({ isSpeaking: true, speakMode: mode });
+    wx.showLoading({ title: '正在合成语音...' });
+
+    wx.request({
+      url: `${BASE_URL}/api/news/tts`,
+      method: 'POST',
+      data: {
+        text: text,
+        voice: this.data.currentVoice
+      },
+      success: (res) => {
+        wx.hideLoading();
+        if (res.data && res.data.success) {
+          if (res.data.data.isMock) {
+            wx.showToast({ title: 'TTS 服务未开通，使用模拟模式', icon: 'none', duration: 2000 });
+            this.startMockSpeaking(text, mode);
+          } else if (res.data.data.audioUrl) {
+            this.playAudio(res.data.data.audioUrl);
+          }
+        } else {
+          wx.showToast({ title: '语音合成失败', icon: 'none' });
+          this.startMockSpeaking(text, mode);
+        }
+      },
+      fail: () => {
+        wx.hideLoading();
+        wx.showToast({ title: '网络错误，使用模拟模式', icon: 'none' });
+        this.startMockSpeaking(text, mode);
+      }
+    });
+  },
+
+  // 播放音频
+  playAudio(audioUrl) {
+    const innerAudioContext = this.data.innerAudioContext;
+    innerAudioContext.src = audioUrl;
+    innerAudioContext.play();
+    wx.showToast({ title: '开始朗读', icon: 'success', duration: 1500 });
+  },
+
+  // 模拟朗读（降级方案）
+  startMockSpeaking(text, mode) {
+    this.setData({ isSpeaking: true, speakMode: mode });
+    wx.showToast({ title: '开始朗读', icon: 'none', duration: 1000 });
+    const chunks = this.splitText(text, 500);
+    this.speakChunks(chunks, 0);
+  },
+
+  // 分段模拟朗读
+  speakChunks(chunks, index) {
+    if (index >= chunks.length) {
+      this.setData({ isSpeaking: false, speakMode: '' });
+      return;
+    }
+
+    wx.showToast({ title: `朗读中 ${index + 1}/${chunks.length}`, icon: 'none', duration: 1500 });
+
+    setTimeout(() => {
+      if (index < chunks.length - 1) {
+        this.speakChunks(chunks, index + 1);
+      } else {
+        this.setData({ isSpeaking: false, speakMode: '' });
+        wx.showToast({ title: '朗读完成', icon: 'success' });
+      }
+    }, Math.min(chunks[index].length * 200, 30000));
+  },
+
+  // 停止朗读
+  stopSpeaking() {
+    if (this.data.innerAudioContext) {
+      this.data.innerAudioContext.stop();
+    }
+    this.setData({ isSpeaking: false, speakMode: '' });
+    wx.showToast({ title: '已停止朗读', icon: 'none' });
+  },
+
+  // 切换音色选择器
+  onToggleVoiceSelector() {
+    this.setData({ showVoiceSelector: !this.data.showVoiceSelector });
+  },
+
+  // 选择音色
+  onSelectVoice(e) {
+    const voice = e.currentTarget.dataset.voice;
+    this.setData({ currentVoice: voice, showVoiceSelector: false });
+    wx.showToast({ title: '已切换音色', icon: 'success' });
+  },
+
+  // 文本分段
+  splitText(text, maxLength) {
+    const chunks = [];
+    let current = '';
+    
+    const sentences = text.match(/[^。！？!?]+[。！？!?]?/g) || [text];
+    
+    for (const sentence of sentences) {
+      if (current.length + sentence.length > maxLength && current.length > 0) {
+        chunks.push(current);
+        current = sentence;
+      } else {
+        current += sentence;
+      }
+    }
+    
+    if (current.length > 0) chunks.push(current);
+    return chunks;
+  },
+
+  onUnload() {
+    if (this.data.innerAudioContext) {
+      this.data.innerAudioContext.stop();
+      this.data.innerAudioContext.destroy();
+    }
   },
 
   onOpenSourceUrl() {
