@@ -32,7 +32,7 @@ Page({
     speakMode: '',
     innerAudioContext: null,
     ttsMode: 'real', // 'real' 真实 TTS，'mock' 模拟
-    currentVoice: 'Neil', // Neil, Ethan, Serena, Bellona
+    currentVoice: 'Ethan', // Ethan, Serena, Jada, Dylan
     showVoiceSelector: false
   },
 
