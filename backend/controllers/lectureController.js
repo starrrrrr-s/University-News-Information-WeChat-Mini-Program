@@ -1,6 +1,37 @@
 const Lecture = require('../models/Lecture');
 const { success, error, paginate } = require('../utils/response');
 
+/**
+ * 格式化讲座时间字段
+ * @param {Object} lecture 讲座对象
+ * @returns {Object} 格式化后的讲座对象
+ */
+const formatLectureTime = (lecture) => {
+  const lectureData = lecture.toJSON ? lecture.toJSON() : lecture;
+  
+  if (lectureData.start_time) {
+    const d = new Date(lectureData.start_time);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hour = String(d.getHours()).padStart(2, '0');
+    const minute = String(d.getMinutes()).padStart(2, '0');
+    lectureData.start_time = `${year}-${month}-${day} ${hour}:${minute}`;
+  }
+  
+  if (lectureData.end_time) {
+    const d = new Date(lectureData.end_time);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hour = String(d.getHours()).padStart(2, '0');
+    const minute = String(d.getMinutes()).padStart(2, '0');
+    lectureData.end_time = `${year}-${month}-${day} ${hour}:${minute}`;
+  }
+  
+  return lectureData;
+};
+
 // 获取讲座列表
 const getLectureList = async (req, res) => {
   try {
@@ -13,7 +44,9 @@ const getLectureList = async (req, res) => {
       offset: parseInt(offset)
     });
 
-    return paginate(res, rows, count, parseInt(page), parseInt(limit));
+    const formattedRows = rows.map(lecture => formatLectureTime(lecture));
+
+    return paginate(res, formattedRows, count, parseInt(page), parseInt(limit));
   } catch (err) {
     console.error('获取讲座列表失败:', err);
     return error(res, '获取讲座列表失败');
@@ -30,7 +63,9 @@ const getLectureDetail = async (req, res) => {
       return error(res, '讲座不存在');
     }
 
-    return success(res, lecture, '获取讲座详情成功');
+    const formattedLecture = formatLectureTime(lecture);
+
+    return success(res, formattedLecture, '获取讲座详情成功');
   } catch (err) {
     console.error('获取讲座详情失败:', err);
     return error(res, '获取讲座详情失败');

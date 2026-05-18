@@ -9,6 +9,7 @@ const collectionRoutes = require('./routes/collection');
 const adminRoutes = require('./routes/admin');
 const commentRoutes = require('./routes/comment');
 const configRoutes = require('./routes/config');
+const feedbackRoutes = require('./routes/feedback');
 
 const User = require('./models/User');
 const Category = require('./models/Category');
@@ -17,6 +18,7 @@ const Lecture = require('./models/Lecture');
 const Collection = require('./models/Collection');
 const Comment = require('./models/Comment');
 const AppConfig = require('./models/AppConfig');
+const Feedback = require('./models/Feedback');
 const configController = require('./controllers/configController');
 
 const app = express();
@@ -36,6 +38,7 @@ app.use('/api/collections', collectionRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/config', configRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // 健康检查
 app.get('/api/health', (req, res) => {

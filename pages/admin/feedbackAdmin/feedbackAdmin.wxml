@@ -1,17 +1,27 @@
 <view class="feedback-admin">
   <!-- 筛选栏 -->
   <view class="filter-bar">
-    <picker mode="selector" range="{{['全部', '待处理', '处理中', '已处理']}}" bindchange="onFilterChange">
+    <picker mode="selector" range="{{['全部', '待处理', '处理中', '已解决']}}" bindchange="onFilterChange">
       <view class="filter-picker">
         <text>状态筛选</text>
         <text class="picker-arrow">▼</text>
       </view>
     </picker>
+    <view class="unhandled-count" wx:if="{{unhandledCount > 0}}">
+      <text class="count-badge">{{unhandledCount}}</text>
+      <text>待处理</text>
+    </view>
   </view>
 
   <!-- 反馈列表 -->
   <view class="feedback-list" wx:if="{{feedbackList.length > 0}}">
-    <view class="feedback-item" wx:for="{{feedbackList}}" wx:key="id">
+    <view 
+      class="feedback-item {{item.admin_read ? '' : 'unread'}}" 
+      wx:for="{{feedbackList}}" 
+      wx:key="id"
+      bindtap="viewFeedbackDetail"
+      data-id="{{item.id}}"
+    >
       <view class="feedback-header">
         <view class="feedback-meta">
           <text class="feedback-type">{{item.type}}</text>
@@ -35,6 +45,24 @@
       </view>
 
       <view class="feedback-actions">
+        <view class="status-actions" wx:if="{{item.status < 2}}">
+          <button 
+            class="status-btn" 
+            wx:if="{{item.status === 0}}"
+            bindtap="setStatusProcessing"
+            data-id="{{item.id}}"
+          >
+            开始处理
+          </button>
+          <button 
+            class="status-btn done" 
+            wx:if="{{item.status === 1}}"
+            bindtap="setStatusDone"
+            data-id="{{item.id}}"
+          >
+            标记已解决
+          </button>
+        </view>
         <button class="action-btn reply-btn" bindtap="showReplyDialog" data-id="{{item.id}}" data-type="{{item.type}}" data-content="{{item.content}}">
           回复
         </button>
@@ -64,7 +92,7 @@
 
 <!-- 回复弹窗 -->
 <view class="modal-mask" wx:if="{{showReplyModal}}" bindtap="hideReplyModal">
-  <view class="modal-content" catchtap="">
+  <view class="modal-content" catchtap="stopPropagation">
     <view class="modal-header">
       <text class="modal-title">回复反馈</text>
       <text class="modal-close" bindtap="hideReplyModal">×</text>
@@ -84,6 +112,8 @@
           value="{{replyContent}}"
           bindinput="onReplyInput"
           maxlength="500"
+          catchtap="stopPropagation"
+          focus="{{showReplyModal}}"
         />
       </view>
     </view>

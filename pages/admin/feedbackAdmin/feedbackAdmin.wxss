@@ -8,6 +8,9 @@
   background-color: #ffffff;
   padding: 20rpx 30rpx;
   border-bottom: 1rpx solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .filter-picker {
@@ -23,6 +26,27 @@
   color: #999;
 }
 
+.unhandled-count {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 26rpx;
+  color: #E64340;
+}
+
+.count-badge {
+  background-color: #E64340;
+  color: #ffffff;
+  font-size: 22rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+}
+
 /* 反馈列表 */
 .feedback-list {
   padding: 20rpx;
@@ -34,6 +58,10 @@
   padding: 24rpx;
   margin-bottom: 20rpx;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.feedback-item.unread {
+  border-left: 6rpx solid #E64340;
 }
 
 .feedback-header {
@@ -131,6 +159,24 @@
   display: flex;
   gap: 16rpx;
   margin-top: 16rpx;
+}
+
+.status-actions {
+  display: flex;
+  gap: 12rpx;
+}
+
+.status-btn {
+  font-size: 24rpx;
+  padding: 12rpx 20rpx;
+  border-radius: 6rpx;
+  border: none;
+  background-color: #2196f3;
+  color: #ffffff;
+}
+
+.status-btn.done {
+  background-color: #4caf50;
 }
 
 .action-btn {

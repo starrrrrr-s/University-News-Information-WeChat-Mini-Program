@@ -52,7 +52,7 @@
 }
 
 .form-actions {
-  padding: 20rpx 20rpx 40rpx;
+  padding: 20rpx 20rpx calc(40rpx + env(safe-area-inset-bottom));
 }
 
 .save-btn {
@@ -63,4 +63,6 @@
   border-radius: 12rpx;
   border: none;
   box-shadow: 0 4rpx 12rpx rgba(26, 173, 25, 0.3);
+  width: 100%;
+  margin: 0;
 }
