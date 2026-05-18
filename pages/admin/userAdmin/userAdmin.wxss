@@ -102,6 +102,22 @@
   color: #ffffff;
 }
 
+.action-btn.block {
+  background-color: #E64340;
+  color: #ffffff;
+}
+
+.action-btn.unblock {
+  background-color: #1AAD19;
+  color: #ffffff;
+}
+
+.action-btn.disabled {
+  background-color: #cccccc !important;
+  color: #999999 !important;
+  pointer-events: none;
+}
+
 .empty-tip {
   text-align: center;
   padding: 100rpx 0;

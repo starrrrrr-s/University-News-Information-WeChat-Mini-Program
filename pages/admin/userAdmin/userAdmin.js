@@ -1,20 +1,10 @@
-const BASE_URL = 'http://localhost:3000';
-const STORAGE_KEY_USERS = 'user_list';
+const BASE_URL = 'http://localhost:3001';
 const app = getApp();
-
-const defaultUsers = [
-  {
-    id: 1,
-    nickName: '管理员',
-    avatarUrl: '',
-    isAdmin: false,
-    registerDate: '2024-01-01'
-  }
-];
 
 Page({
   data: {
     userList: [],
+    loading: false,
 
     // 用户评论弹窗
     showCommentModal: false,
@@ -45,25 +35,40 @@ Page({
   },
 
   loadUsers() {
-    let users = wx.getStorageSync(STORAGE_KEY_USERS) || defaultUsers;
-
-    const currentUser = wx.getStorageSync('userInfo');
-    if (currentUser && currentUser.nickName) {
-      const exists = users.some(u => u.nickName === currentUser.nickName);
-      if (!exists) {
-        const maxId = users.reduce((max, u) => u.id > max ? u.id : max, 0);
-        users.push({
-          id: maxId + 1,
-          nickName: currentUser.nickName,
-          avatarUrl: currentUser.avatarUrl || '',
-          isAdmin: currentUser.isAdmin || false,
-          registerDate: new Date().toISOString().split('T')[0]
-        });
-        wx.setStorageSync(STORAGE_KEY_USERS, users);
-      }
+    this.setData({ loading: true });
+    
+    const token = wx.getStorageSync('token');
+    if (!token) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
     }
 
-    this.setData({ userList: users });
+    wx.request({
+      url: `${BASE_URL}/api/admin/users`,
+      method: 'GET',
+      header: { 'Authorization': `Bearer ${token}` },
+      success: (res) => {
+        if (res.data && res.data.success) {
+          const users = (res.data.data || []).map(user => ({
+            id: user.id,
+            nickName: user.nickname,
+            avatarUrl: user.avatar_url || '',
+            isAdmin: user.is_admin || false,
+            isBlocked: user.is_blocked || false,
+            registerDate: user.created_at || user.updated_at || ''
+          }));
+          this.setData({ userList: users });
+        } else {
+          wx.showToast({ title: res.data.message || '加载失败', icon: 'none' });
+        }
+      },
+      fail: () => {
+        wx.showToast({ title: '网络错误，请检查后端服务', icon: 'none' });
+      },
+      complete: () => {
+        this.setData({ loading: false });
+      }
+    });
   },
 
   onToggleAdmin(e) {
@@ -76,14 +81,62 @@ Page({
       content: `确定要${action}吗？`,
       success: (res) => {
         if (res.confirm) {
-          let users = wx.getStorageSync(STORAGE_KEY_USERS) || [];
-          const index = users.findIndex(u => u.id === id);
-          if (index !== -1) {
-            users[index].isAdmin = !isAdmin;
-            wx.setStorageSync(STORAGE_KEY_USERS, users);
-            this.setData({ userList: users });
-            wx.showToast({ title: '操作成功', icon: 'success' });
-          }
+          const token = wx.getStorageSync('token');
+          wx.request({
+            url: `${BASE_URL}/api/admin/users/${id}`,
+            method: 'PUT',
+            header: { 'Authorization': `Bearer ${token}` },
+            data: { is_admin: !isAdmin },
+            success: (res) => {
+              if (res.data && res.data.success) {
+                wx.showToast({ title: '操作成功', icon: 'success' });
+                this.loadUsers(); // 刷新用户列表
+              } else {
+                wx.showToast({ title: res.data.message || '操作失败', icon: 'none' });
+              }
+            },
+            fail: () => {
+              wx.showToast({ title: '网络错误', icon: 'none' });
+            }
+          });
+        }
+      }
+    });
+  },
+
+  // ─── 拉黑/解封用户 ────────────────────────────────────────────
+
+  onToggleBlock(e) {
+    const id = parseInt(e.currentTarget.dataset.id);
+    const isBlocked = e.currentTarget.dataset.isblocked === 'true';
+    const action = isBlocked ? '解封' : '拉黑';
+
+    wx.showModal({
+      title: '确认操作',
+      content: `确定要${action}该用户吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          const token = wx.getStorageSync('token');
+          const url = isBlocked 
+            ? `${BASE_URL}/api/admin/users/${id}/unblock` 
+            : `${BASE_URL}/api/admin/users/${id}/block`;
+          
+          wx.request({
+            url: url,
+            method: 'PUT',
+            header: { 'Authorization': `Bearer ${token}` },
+            success: (res) => {
+              if (res.data && res.data.success) {
+                wx.showToast({ title: `${action}成功`, icon: 'success' });
+                this.loadUsers(); // 刷新用户列表
+              } else {
+                wx.showToast({ title: res.data.message || `${action}失败`, icon: 'none' });
+              }
+            },
+            fail: () => {
+              wx.showToast({ title: '网络错误', icon: 'none' });
+            }
+          });
         }
       }
     });

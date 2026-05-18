@@ -20,6 +20,8 @@
         <button class="action-btn {{item.isAdmin ? 'remove' : 'setAdmin'}}" bindtap="onToggleAdmin" data-id="{{item.id}}" data-isadmin="{{item.isAdmin}}">
           {{item.isAdmin ? '取消管理员' : '设为管理员'}}
         </button>
+        <button class="action-btn block{{item.isBlocked ? ' disabled' : ''}}" bindtap="onToggleBlock" data-id="{{item.id}}" data-isblocked="false" disabled="{{item.isBlocked}}">拉黑</button>
+        <button class="action-btn unblock{{!item.isBlocked ? ' disabled' : ''}}" bindtap="onToggleBlock" data-id="{{item.id}}" data-isblocked="true" disabled="{{!item.isBlocked}}">解封</button>
       </view>
     </view>
   </view>
