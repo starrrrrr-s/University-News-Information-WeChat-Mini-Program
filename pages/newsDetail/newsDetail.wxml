@@ -120,21 +120,21 @@
             </view>
             <!-- 音色选择器 -->
             <view class="voice-selector" wx:if="{{showVoiceSelector}}">
-              <view class="voice-item {{currentVoice === 'Neil' ? 'selected' : ''}}" bindtap="onSelectVoice" data-voice="Neil">
-                <text class="voice-name">Neil 阿闻</text>
+              <view class="voice-item {{currentVoice === 'Ethan' ? 'selected' : ''}}" bindtap="onSelectVoice" data-voice="Ethan">
+                <text class="voice-name">Ethan</text>
                 <text class="voice-desc">男性｜标准新闻主持人声线</text>
               </view>
-              <view class="voice-item {{currentVoice === 'Ethan' ? 'selected' : ''}}" bindtap="onSelectVoice" data-voice="Ethan">
-                <text class="voice-name">Ethan 晨煦</text>
-                <text class="voice-desc">男性｜阳光沉稳通用男声</text>
+              <view class="voice-item {{currentVoice === 'Dylan' ? 'selected' : ''}}" bindtap="onSelectVoice" data-voice="Dylan">
+                <text class="voice-name">Dylan</text>
+                <text class="voice-desc">男性｜沉稳大气男声</text>
               </view>
               <view class="voice-item {{currentVoice === 'Serena' ? 'selected' : ''}}" bindtap="onSelectVoice" data-voice="Serena">
-                <text class="voice-name">Serena 苏瑶</text>
-                <text class="voice-desc">女性｜温柔知性资讯精读</text>
+                <text class="voice-name">Serena</text>
+                <text class="voice-desc">女性｜温柔知性女声</text>
               </view>
-              <view class="voice-item {{currentVoice === 'Bellona' ? 'selected' : ''}}" bindtap="onSelectVoice" data-voice="Bellona">
-                <text class="voice-name">Bellona 燕铮莺</text>
-                <text class="voice-desc">女性｜吐字洪亮正式播报</text>
+              <view class="voice-item {{currentVoice === 'Jada' ? 'selected' : ''}}" bindtap="onSelectVoice" data-voice="Jada">
+                <text class="voice-name">Jada</text>
+                <text class="voice-desc">女性｜正式播报女声</text>
               </view>
             </view>
           </view>
