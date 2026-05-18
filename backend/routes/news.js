@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const newsController = require('../controllers/newsController');
+const aiController = require('../controllers/aiController');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 
@@ -24,5 +25,11 @@ router.put('/:id', auth, admin, newsController.updateNews);
 
 // 删除新闻（管理员）
 router.delete('/:id', auth, admin, newsController.deleteNews);
+
+// AI：提取新闻内容并生成要点
+router.post('/extract-content', aiController.extractNewsContent);
+
+// TTS：语音合成
+router.post('/tts', aiController.textToSpeech);
 
 module.exports = router;
