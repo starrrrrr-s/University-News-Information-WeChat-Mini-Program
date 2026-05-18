@@ -43,6 +43,112 @@
       <text style="font-size: {{fontSize}}rpx; line-height: 1.9;">{{news.content}}</text>
     </view>
 
+    <!-- AI 智能助手卡片 -->
+    <view class="ai-section">
+      <view class="ai-card">
+        <!-- 卡片头部 -->
+        <view class="ai-card-header">
+          <view class="ai-title-wrapper">
+            <text class="ai-icon">✨</text>
+            <text class="ai-title">AI 智能要点提炼</text>
+          </view>
+          <view class="ai-status" wx:if="{{isSpeaking}}">
+            <text class="status-dot"></text>
+            <text class="status-text">{{speakMode === 'keyPoints' ? '要点播报中' : '全文朗读中'}}</text>
+          </view>
+        </view>
+        
+        <!-- 加载状态 -->
+        <view class="ai-loading-wrapper" wx:if="{{aiLoading}}">
+          <view class="loading-spinner"></view>
+          <text class="ai-loading-text">AI 正在分析中...</text>
+        </view>
+        
+        <!-- 错误状态 -->
+        <view class="ai-error-wrapper" wx:if="{{aiError}}">
+          <text class="ai-error-icon">⚠️</text>
+          <text class="ai-error-text">{{aiError}}</text>
+        </view>
+        
+        <!-- AI 内容区域 -->
+        <view class="ai-content-wrapper" wx:if="{{!aiLoading && !aiError && aiData.keyPoints}}">
+          <!-- 摘要部分 -->
+          <view class="ai-summary-box" wx:if="{{aiData.summary}}">
+            <view class="summary-label">📝 内容摘要</view>
+            <text class="summary-text">{{aiData.summary}}</text>
+          </view>
+          
+          <!-- 要点列表 -->
+          <view class="key-points-section">
+            <view class="key-points-label">🎯 核心要点</view>
+            <view class="key-points-list">
+              <view class="key-point-item" wx:for="{{aiData.keyPoints}}" wx:key="index">
+                <view class="point-badge" wx:if="{{item.type === 'time'}}">🕐</view>
+                <view class="point-badge" wx:elif="{{item.type === 'location'}}">📍</view>
+                <view class="point-badge" wx:elif="{{item.type === 'person'}}">👤</view>
+                <view class="point-badge" wx:elif="{{item.type === 'title'}}">📌</view>
+                <view class="point-badge" wx:else>💡</view>
+                <text class="point-text">{{item.text}}</text>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 语音操作按钮 -->
+          <view class="ai-actions">
+            <view class="action-divider"></view>
+            <view class="voice-buttons">
+              <button 
+                class="voice-button {{speakMode === 'keyPoints' ? 'active' : ''}}" 
+                bindtap="onSpeakKeyPoints"
+              >
+                <text class="voice-icon">{{isSpeaking && speakMode === 'keyPoints' ? '⏸️' : '🔊'}}</text>
+                <text class="voice-label">要点播报</text>
+              </button>
+              <button 
+                class="voice-button {{speakMode === 'fullText' ? 'active' : ''}}" 
+                bindtap="onSpeakFullText"
+              >
+                <text class="voice-icon">{{isSpeaking && speakMode === 'fullText' ? '⏸️' : '📢'}}</text>
+                <text class="voice-label">全文朗读</text>
+              </button>
+            </view>
+            <!-- 音色选择按钮 -->
+            <view class="voice-selector-btn" bindtap="onToggleVoiceSelector">
+              <text class="selector-icon">🎙️</text>
+              <text class="selector-text">当前音色：{{currentVoice}}</text>
+              <text class="selector-arrow">{{showVoiceSelector ? '▲' : '▼'}}</text>
+            </view>
+            <!-- 音色选择器 -->
+            <view class="voice-selector" wx:if="{{showVoiceSelector}}">
+              <view class="voice-item {{currentVoice === 'Neil' ? 'selected' : ''}}" bindtap="onSelectVoice" data-voice="Neil">
+                <text class="voice-name">Neil 阿闻</text>
+                <text class="voice-desc">男性｜标准新闻主持人声线</text>
+              </view>
+              <view class="voice-item {{currentVoice === 'Ethan' ? 'selected' : ''}}" bindtap="onSelectVoice" data-voice="Ethan">
+                <text class="voice-name">Ethan 晨煦</text>
+                <text class="voice-desc">男性｜阳光沉稳通用男声</text>
+              </view>
+              <view class="voice-item {{currentVoice === 'Serena' ? 'selected' : ''}}" bindtap="onSelectVoice" data-voice="Serena">
+                <text class="voice-name">Serena 苏瑶</text>
+                <text class="voice-desc">女性｜温柔知性资讯精读</text>
+              </view>
+              <view class="voice-item {{currentVoice === 'Bellona' ? 'selected' : ''}}" bindtap="onSelectVoice" data-voice="Bellona">
+                <text class="voice-name">Bellona 燕铮莺</text>
+                <text class="voice-desc">女性｜吐字洪亮正式播报</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 点击获取提示 -->
+        <view class="ai-prompt-wrapper" wx:if="{{!aiData.keyPoints && !aiLoading}}" bindtap="onExtractContent">
+          <view class="prompt-icon">🤖</view>
+          <text class="prompt-text">点击获取 AI 要点提炼</text>
+          <text class="prompt-hint">自动提取时间、地点、人物等关键信息</text>
+        </view>
+      </view>
+    </view>
+
     <!-- 查看原文按钮 -->
     <view class="source-link-section" wx:if="{{news.sourceUrl}}">
       <view class="source-divider"></view>
