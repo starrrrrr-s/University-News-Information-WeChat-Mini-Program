@@ -2,35 +2,34 @@ const app = getApp();
 
 const BASE_URL = 'http://localhost:3001';
 
+const STATUS_MAP = {
+  0: '待处理',
+  1: '处理中',
+  2: '已解决'
+};
+
 Page({
   data: {
     isLoggedIn: false,
     userInfo: null,
-    
-    // 标签切换
+
     activeTab: 'submit',
     unreadCount: 0,
-    
-    // 反馈类型
+
     feedbackTypes: ['功能建议', '问题反馈', '内容纠错', '其他'],
     selectedType: '',
-    
-    // 反馈内容
+
     content: '',
-    contact: '', // 联系方式（可选）
-    
-    // 字数统计
+    contact: '',
+
     maxLength: 500,
     contentLength: 0,
-    
-    // 提交状态
+
     submitting: false,
-    
-    // 反馈历史
+
     feedbackHistory: [],
     historyLoading: false,
-    
-    // 详情弹窗
+
     showDetailModal: false,
     currentDetail: null
   },
@@ -40,7 +39,6 @@ Page({
   },
 
   onShow() {
-    // 应用主题颜色
     const themeConfig = wx.getStorageSync('themeConfig');
     if (themeConfig) {
       app.globalData.themeConfig = themeConfig;
@@ -58,15 +56,16 @@ Page({
     this.setData({ isLoggedIn, userInfo });
   },
 
-  // 切换标签
-  switchTab(tab) {
+  switchTab(e) {
+    const tab = e.currentTarget.dataset.tab;
     this.setData({ activeTab: tab });
     if (tab === 'history') {
       this.loadFeedbackHistory();
     }
   },
 
-  // 选择反馈类型
+  stopPropagation() {},
+
   onTypeSelect(e) {
     const index = e.detail.value;
     this.setData({
@@ -74,7 +73,6 @@ Page({
     });
   },
 
-  // 输入反馈内容
   onContentInput(e) {
     const content = e.detail.value;
     this.setData({
@@ -83,16 +81,13 @@ Page({
     });
   },
 
-  // 输入联系方式
   onContactInput(e) {
     this.setData({
       contact: e.detail.value
     });
   },
 
-  // 提交反馈
   onSubmit() {
-    // 检查登录状态
     if (!this.data.isLoggedIn) {
       wx.showModal({
         title: '提示',
@@ -107,13 +102,11 @@ Page({
       return;
     }
 
-    // 验证反馈类型
     if (!this.data.selectedType) {
       wx.showToast({ title: '请选择反馈类型', icon: 'none' });
       return;
     }
 
-    // 验证反馈内容
     const content = this.data.content.trim();
     if (!content) {
       wx.showToast({ title: '请输入反馈内容', icon: 'none' });
@@ -125,7 +118,6 @@ Page({
       return;
     }
 
-    // 提交反馈
     this.setData({ submitting: true });
 
     const token = wx.getStorageSync('token');
@@ -148,7 +140,6 @@ Page({
       success: (res) => {
         if (res.data && res.data.success) {
           wx.showToast({ title: '提交成功', icon: 'success' });
-          // 清空表单
           this.setData({
             selectedType: '',
             content: '',
@@ -160,7 +151,6 @@ Page({
         }
       },
       fail: () => {
-        // 后端不可用时，保存到本地
         this.saveToLocal(feedbackData);
         wx.showToast({ title: '反馈已保存', icon: 'success' });
         this.setData({
@@ -177,7 +167,6 @@ Page({
     });
   },
 
-  // 本地保存反馈（离线模式）
   saveToLocal(feedbackData) {
     const feedbackList = wx.getStorageSync('local_feedback') || [];
     feedbackList.push({
@@ -191,7 +180,6 @@ Page({
     wx.setStorageSync('local_feedback', feedbackList);
   },
 
-  // 加载反馈历史
   loadFeedbackHistory() {
     if (!this.data.isLoggedIn) return;
 
@@ -206,22 +194,55 @@ Page({
         'Authorization': `Bearer ${token}`
       },
       success: (res) => {
+        console.log('反馈列表返回数据：', res.data);
         if (res.data && res.data.success) {
           const list = res.data.data || [];
-          this.setData({
-            feedbackHistory: list
+          console.log('处理前的列表：', list);
+
+          const processedList = list.map(item => {
+            const processed = { ...item };
+
+            if (item.createdAt && !item.created_at) {
+              processed.created_at = item.createdAt;
+            }
+            if (item.updatedAt && !item.updated_at) {
+              processed.updated_at = item.updatedAt;
+            }
+            if (item.adminRead && !item.admin_read) {
+              processed.admin_read = item.adminRead;
+            }
+            if (item.isRead && !item.is_read) {
+              processed.is_read = item.isRead;
+            }
+            if (typeof processed.status === 'string') {
+              processed.status = parseInt(processed.status);
+            }
+
+            const statusKey = processed.status;
+            processed.statusText = STATUS_MAP[statusKey] || STATUS_MAP[parseInt(statusKey)] || '待处理';
+            processed.formattedTime = this.formatTime(processed.created_at);
+
+            console.log('processed item:', JSON.stringify(processed));
+            return processed;
           });
-          this.updateUnreadCount(list);
+
+          console.log('处理后的列表：', JSON.stringify(processedList));
+
+          this.setData({
+            feedbackHistory: processedList
+          });
+          this.updateUnreadCount(processedList);
         }
       },
       fail: () => {
-        // 离线模式，读取本地存储
         const localFeedback = wx.getStorageSync('local_feedback') || [];
         const list = localFeedback.map(item => ({
           ...item,
           status: 0,
+          statusText: '待处理',
           is_read: true,
-          created_at: item.createdAt
+          created_at: item.createdAt,
+          formattedTime: this.formatTime(item.createdAt)
         }));
         this.setData({
           feedbackHistory: list
@@ -233,32 +254,27 @@ Page({
     });
   },
 
-  // 更新未读数量
   updateUnreadCount(list) {
     const count = list.filter(item => item.reply && !item.is_read).length;
     this.setData({ unreadCount: count });
   },
 
-  // 查看反馈详情（标记为已读并显示弹窗）
   viewFeedbackDetail(e) {
     const { id } = e.currentTarget.dataset;
     const feedback = this.data.feedbackHistory.find(f => f.id === id);
-    
+
     if (feedback) {
-      // 显示详情弹窗
       this.setData({
         showDetailModal: true,
         currentDetail: feedback
       });
-      
-      // 如果有回复且未读，标记为已读
+
       if (feedback.reply && !feedback.is_read) {
         this.markAsRead(id);
       }
     }
   },
 
-  // 关闭详情弹窗
   hideDetailModal() {
     this.setData({
       showDetailModal: false,
@@ -266,7 +282,6 @@ Page({
     });
   },
 
-  // 标记为已读
   markAsRead(id) {
     const token = wx.getStorageSync('token');
 
@@ -278,13 +293,12 @@ Page({
       },
       success: (res) => {
         if (res.data && res.data.success) {
-          // 更新本地状态
           this.setData({
-            feedbackHistory: this.data.feedbackHistory.map(item => 
+            feedbackHistory: this.data.feedbackHistory.map(item =>
               item.id === id ? { ...item, is_read: true } : item
             )
           });
-          this.updateUnreadCount(this.data.feedbackHistory.map(item => 
+          this.updateUnreadCount(this.data.feedbackHistory.map(item =>
             item.id === id ? { ...item, is_read: true } : item
           ));
         }
@@ -292,27 +306,20 @@ Page({
     });
   },
 
-  // 获取状态文字
   getStatusText(status) {
-    const statusMap = {
-      0: '待处理',
-      1: '处理中',
-      2: '已解决'
-    };
-    return statusMap[status] || '未知';
+    return STATUS_MAP[status] || STATUS_MAP[parseInt(status)] || '待处理';
   },
 
-  // 获取状态样式
   getStatusClass(status) {
     const classMap = {
       0: 'status-pending',
       1: 'status-processing',
       2: 'status-done'
     };
-    return classMap[status] || '';
+    const statusNum = typeof status === 'string' ? parseInt(status) : status;
+    return classMap[status] || classMap[statusNum] || 'status-pending';
   },
 
-  // 获取类型样式
   getTypeClass(type) {
     const classMap = {
       '功能建议': 'type-suggestion',
@@ -323,10 +330,10 @@ Page({
     return classMap[type] || 'type-other';
   },
 
-  // 格式化时间
   formatTime(isoStr) {
-    if (!isoStr) return '';
+    if (!isoStr) return '未知时间';
     const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return '未知时间';
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');

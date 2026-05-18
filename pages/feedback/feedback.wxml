@@ -1,24 +1,23 @@
 <view class="feedback-container">
-  <!-- 标签切换 -->
   <view class="tab-bar">
-    <view 
-      class="tab-item {{activeTab === 'submit' ? 'active' : ''}}" 
-      bindtap="switchTab('submit')"
+    <view
+      class="tab-item {{activeTab === 'submit' ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-tab="submit"
     >
       <text>提交反馈</text>
     </view>
-    <view 
-      class="tab-item {{activeTab === 'history' ? 'active' : ''}}" 
-      bindtap="switchTab('history')"
+    <view
+      class="tab-item {{activeTab === 'history' ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-tab="history"
     >
       <text>反馈记录</text>
       <view class="badge" wx:if="{{unreadCount > 0}}">{{unreadCount}}</view>
     </view>
   </view>
 
-  <!-- 提交反馈 -->
   <view wx:if="{{activeTab === 'submit'}}">
-    <!-- 提示说明 -->
     <view class="tips-section">
       <view class="tips-card">
         <text class="tips-icon">💡</text>
@@ -26,9 +25,7 @@
       </view>
     </view>
 
-    <!-- 反馈表单 -->
     <view class="form-section">
-      <!-- 反馈类型 -->
       <view class="form-item">
         <view class="form-label">
           <text class="required">*</text>
@@ -42,14 +39,13 @@
         </picker>
       </view>
 
-      <!-- 反馈内容 -->
       <view class="form-item">
         <view class="form-label">
           <text class="required">*</text>
           <text>反馈内容</text>
           <text class="char-count">{{contentLength}}/{{maxLength}}</text>
         </view>
-        <textarea 
+        <textarea
           class="content-input"
           placeholder="请详细描述您的建议或遇到的问题，至少10个字..."
           maxlength="{{maxLength}}"
@@ -60,13 +56,12 @@
         />
       </view>
 
-      <!-- 联系方式（可选） -->
       <view class="form-item">
         <view class="form-label">
           <text>联系方式</text>
           <text class="optional">(选填)</text>
         </view>
-        <input 
+        <input
           class="contact-input"
           placeholder="手机号或邮箱，方便我们回复您"
           value="{{contact}}"
@@ -76,10 +71,9 @@
       </view>
     </view>
 
-    <!-- 提交按钮 -->
     <view class="submit-section">
-      <button 
-        class="submit-btn {{submitting ? 'disabled' : ''}}" 
+      <button
+        class="submit-btn {{submitting ? 'disabled' : ''}}"
         bindtap="onSubmit"
         disabled="{{submitting}}"
       >
@@ -87,13 +81,11 @@
       </button>
     </view>
 
-    <!-- 底部说明 -->
     <view class="footer-note">
       <text>感谢您的反馈，我们会尽快处理！</text>
     </view>
   </view>
 
-  <!-- 反馈记录 -->
   <view wx:if="{{activeTab === 'history'}}">
     <view class="history-section">
       <view wx:if="{{feedbackHistory.length === 0}}" class="empty-state">
@@ -102,28 +94,27 @@
       </view>
 
       <view wx:else class="history-list">
-        <view 
-          class="history-item {{item.is_read ? '' : 'unread'}}" 
-          wx:for="{{feedbackHistory}}" 
+        <view
+          class="history-item {{item.is_read ? '' : 'unread'}}"
+          wx:for="{{feedbackHistory}}"
           wx:key="id"
           bindtap="viewFeedbackDetail"
           data-id="{{item.id}}"
         >
           <view class="history-header">
             <view class="type-badge {{getTypeClass(item.type)}}">{{item.type}}</view>
-            <view class="status-tag {{getStatusClass(item.status)}}">{{getStatusText(item.status)}}</view>
+            <view class="status-tag {{getStatusClass(item.status)}}">{{item.statusText || getStatusText(item.status)}}</view>
           </view>
           <view class="history-content">
             <text>{{item.content}}</text>
           </view>
           <view class="history-footer">
-            <text class="time">{{formatTime(item.created_at)}}</text>
+            <text class="time">{{item.formattedTime}}</text>
             <view wx:if="{{item.reply && !item.is_read}}" class="new-reply">
               <text>有新回复</text>
             </view>
           </view>
-          
-          <!-- 管理员回复 -->
+
           <view wx:if="{{item.reply}}" class="reply-section">
             <view class="reply-header">
               <text class="reply-label">管理员回复：</text>
@@ -136,8 +127,7 @@
       </view>
     </view>
   </view>
-  
-  <!-- 反馈详情弹窗 -->
+
   <view wx:if="{{showDetailModal}}" class="modal-overlay" bindtap="hideDetailModal">
     <view class="modal-content" catchtap="stopPropagation">
       <view class="modal-header">
@@ -153,7 +143,7 @@
         </view>
         <view class="detail-item">
           <text class="detail-label">状态</text>
-          <view class="status-tag {{getStatusClass(currentDetail.status)}}">{{getStatusText(currentDetail.status)}}</view>
+          <view class="status-tag {{getStatusClass(currentDetail.status)}}">{{currentDetail.statusText || getStatusText(currentDetail.status)}}</view>
         </view>
         <view class="detail-item">
           <text class="detail-label">反馈内容</text>
@@ -171,7 +161,7 @@
         </view>
         <view class="detail-item">
           <text class="detail-label">提交时间</text>
-          <text class="detail-text">{{formatTime(currentDetail.created_at)}}</text>
+          <text class="detail-text">{{currentDetail.formattedTime}}</text>
         </view>
       </view>
     </view>
