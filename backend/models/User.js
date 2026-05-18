@@ -31,6 +31,10 @@ const User = sequelize.define('User', {
   is_admin: {
     type: DataTypes.TINYINT,
     defaultValue: 0
+  },
+  is_blocked: {
+    type: DataTypes.TINYINT,
+    defaultValue: 0
   }
 }, {
   timestamps: false,
