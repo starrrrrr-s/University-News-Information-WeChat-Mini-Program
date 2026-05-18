@@ -7,7 +7,7 @@ const { success, error } = require('../utils/response');
 // 微信登录
 const login = async (req, res) => {
   try {
-    const { code } = req.body;
+    const { code, nickname, avatar_url } = req.body;
     if (!code) {
       return error(res, '缺少code参数');
     }
@@ -44,12 +44,23 @@ const login = async (req, res) => {
     // 查找或创建用户
     let user = await User.findOne({ where: { openid } });
     if (!user) {
+      // 新用户：使用微信昵称和头像（如果有）
+      const nicknameToUse = nickname || '用户' + Math.floor(Math.random() * 10000);
       user = await User.create({
         openid,
-        nickname: '用户' + Math.floor(Math.random() * 10000),
-        avatar_url: ''
+        nickname: nicknameToUse,
+        avatar_url: avatar_url || ''
       });
       console.log('创建新用户:', user.nickname);
+    } else {
+      // 老用户：不更新昵称和头像，保留用户之前修改的内容
+      // 只有当数据库中没有昵称或头像时，才使用微信信息
+      if (!user.nickname && nickname) {
+        await user.update({ nickname });
+      }
+      if (!user.avatar_url && avatar_url) {
+        await user.update({ avatar_url });
+      }
     }
 
     // 生成token
