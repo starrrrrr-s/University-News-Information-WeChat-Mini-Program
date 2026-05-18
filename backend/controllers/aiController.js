@@ -48,12 +48,12 @@ const textToSpeech = async (req, res) => {
     }
 
     // 支持的音色
-    const validVoices = ['Neil', 'Ethan', 'Serena', 'Bellona'];
+    const validVoices = ['Neil', 'Ethan', 'Serena', 'Jada', 'Dylan'];
     const selectedVoice = validVoices.includes(voice) ? voice : 'Neil';
 
     const ttsResult = await TTSService.textToSpeech(text, { 
       voice: selectedVoice, 
-      model: 'qwen3-tts-flash'
+      model: 'qwen-tts-latest'
     });
     
     if (!ttsResult.success) {
