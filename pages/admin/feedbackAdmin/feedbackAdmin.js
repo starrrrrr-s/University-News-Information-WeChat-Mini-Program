@@ -18,8 +18,7 @@ Page({
     currentFilter: '', // 状态筛选
     showReplyModal: false,
     currentFeedback: null,
-    replyContent: '',
-    unhandledCount: 0 // 未处理数量
+    replyContent: ''
   },
 
   onLoad() {
@@ -30,12 +29,10 @@ Page({
       app.applyThemeConfig(themeConfig);
     }
     this.loadFeedbackList(true);
-    this.loadUnhandledCount();
   },
 
   onPullDownRefresh() {
     this.loadFeedbackList(true).then(() => {
-      this.loadUnhandledCount();
       wx.stopPullDownRefresh();
     });
   },
@@ -44,26 +41,6 @@ Page({
     if (this.data.hasMore && !this.data.loading) {
       this.loadFeedbackList(false);
     }
-  },
-
-  // 加载未处理数量
-  loadUnhandledCount() {
-    const token = wx.getStorageSync('token');
-
-    wx.request({
-      url: `${BASE_URL}/api/feedback/admin/unhandled-count`,
-      method: 'GET',
-      header: {
-        'Authorization': `Bearer ${token}`
-      },
-      success: (res) => {
-        if (res.data && res.data.success) {
-          this.setData({
-            unhandledCount: res.data.data.count
-          });
-        }
-      }
-    });
   },
 
   async loadFeedbackList(reset = false) {
@@ -87,22 +64,22 @@ Page({
           status: this.data.currentFilter
         },
         success: (res) => {
-        if (res.data && res.data.success) {
-          const list = res.data.data || [];
-          const formattedList = list.map(item => ({
-            ...item,
-            statusText: STATUS_MAP[item.status]?.text || '未知',
-            statusClass: STATUS_MAP[item.status]?.class || '',
-            created_at: this.formatTime(item.created_at)
-          }));
+          if (res.data && res.data.success) {
+            const list = res.data.data || [];
+            const formattedList = list.map(item => ({
+              ...item,
+              statusText: STATUS_MAP[item.status]?.text || '未知',
+              statusClass: STATUS_MAP[item.status]?.class || '',
+              created_at: this.formatTime(item.created_at)
+            }));
 
-          this.setData({
-            feedbackList: reset ? formattedList : [...this.data.feedbackList, ...formattedList],
-            page: page + 1,
-            hasMore: res.data.pagination ? res.data.pagination.page < res.data.pagination.pages : list.length >= 20
-          });
-        }
-      },
+            this.setData({
+              feedbackList: reset ? formattedList : [...this.data.feedbackList, ...formattedList],
+              page: page + 1,
+              hasMore: res.data.pagination.page < res.data.pagination.pages
+            });
+          }
+        },
         fail: () => {
           // 离线模式，读取本地存储
           const localFeedback = wx.getStorageSync('local_feedback') || [];
@@ -111,7 +88,6 @@ Page({
             status: 0,
             statusText: '待处理',
             statusClass: 'pending',
-            admin_read: false,
             created_at: this.formatTime(item.createdAt)
           }));
           this.setData({
@@ -127,84 +103,6 @@ Page({
     });
   },
 
-  // 查看反馈详情（标记为已读）
-  viewFeedbackDetail(e) {
-    const { id } = e.currentTarget.dataset;
-    const feedback = this.data.feedbackList.find(f => f.id === id);
-    
-    if (feedback && !feedback.admin_read) {
-      this.markAdminRead(id);
-    }
-  },
-
-  // 标记管理员已读
-  markAdminRead(id) {
-    const token = wx.getStorageSync('token');
-
-    wx.request({
-      url: `${BASE_URL}/api/feedback/admin/${id}/read`,
-      method: 'PUT',
-      header: {
-        'Authorization': `Bearer ${token}`
-      },
-      success: (res) => {
-        if (res.data && res.data.success) {
-          // 更新本地状态
-          this.setData({
-            feedbackList: this.data.feedbackList.map(item => 
-              item.id === id ? { ...item, admin_read: true } : item
-            )
-          });
-          this.loadUnhandledCount();
-        }
-      }
-    });
-  },
-
-  // 设置状态为处理中
-  setStatusProcessing(e) {
-    const { id } = e.currentTarget.dataset;
-    this.updateStatus(id, 1);
-  },
-
-  // 设置状态为已解决
-  setStatusDone(e) {
-    const { id } = e.currentTarget.dataset;
-    this.updateStatus(id, 2);
-  },
-
-  // 更新状态
-  updateStatus(id, status) {
-    const token = wx.getStorageSync('token');
-
-    wx.showLoading({ title: '操作中...' });
-
-    wx.request({
-      url: `${BASE_URL}/api/feedback/admin/${id}/status`,
-      method: 'PUT',
-      header: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      data: { status },
-      success: (res) => {
-        if (res.data && res.data.success) {
-          wx.showToast({ title: '状态更新成功', icon: 'success' });
-          this.loadFeedbackList(true);
-          this.loadUnhandledCount();
-        } else {
-          wx.showToast({ title: res.data.message || '操作失败', icon: 'none' });
-        }
-      },
-      fail: () => {
-        wx.showToast({ title: '网络错误', icon: 'none' });
-      },
-      complete: () => {
-        wx.hideLoading();
-      }
-    });
-  },
-
   // 筛选状态
   onFilterChange(e) {
     const value = e.detail.value;
@@ -212,9 +110,6 @@ Page({
     this.setData({ currentFilter: filter });
     this.loadFeedbackList(true);
   },
-
-  // 阻止事件冒泡
-  stopPropagation() {},
 
   // 显示回复弹窗
   showReplyDialog(e) {
@@ -259,14 +154,13 @@ Page({
       },
       data: {
         reply: replyContent,
-        status: 2 // 回复后自动标记为已解决
+        status: 2
       },
       success: (res) => {
         if (res.data && res.data.success) {
           wx.showToast({ title: '回复成功', icon: 'success' });
           this.hideReplyModal();
           this.loadFeedbackList(true);
-          this.loadUnhandledCount();
         } else {
           wx.showToast({ title: res.data.message || '回复失败', icon: 'none' });
         }
@@ -310,7 +204,6 @@ Page({
         if (res.data && res.data.success) {
           wx.showToast({ title: '删除成功', icon: 'success' });
           this.loadFeedbackList(true);
-          this.loadUnhandledCount();
         } else {
           wx.showToast({ title: res.data.message || '删除失败', icon: 'none' });
         }
