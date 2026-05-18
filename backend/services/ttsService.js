@@ -34,8 +34,8 @@ class TTSService {
   static async callHttpTTS(text, options = {}) {
     return new Promise((resolve, reject) => {
       const {
-        voice = 'Neil',
-        model = 'qwen3-tts-flash'
+        voice = 'Ethan',
+        model = 'qwen-tts-latest'
       } = options;
 
       console.log(`🚀 正在调用 Qwen-TTS HTTP API`);
