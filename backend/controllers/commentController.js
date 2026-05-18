@@ -71,6 +71,11 @@ const createComment = async (req, res) => {
       return error(res, '评论内容不能超过500字');
     }
 
+    // 检查用户是否被拉黑
+    if (req.user.is_blocked) {
+      return error(res, '您已被拉黑，暂时无法发表评论，请等待解封');
+    }
+
     // 如果是回复，检查父评论是否存在
     if (parent_id) {
       const parentComment = await Comment.findByPk(parent_id);

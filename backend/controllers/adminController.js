@@ -55,8 +55,48 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// 拉黑用户
+const blockUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      return error(res, '用户不存在');
+    }
+
+    await user.update({ is_blocked: 1 });
+
+    return success(res, user, '拉黑用户成功');
+  } catch (err) {
+    console.error('拉黑用户失败:', err);
+    return error(res, '拉黑用户失败');
+  }
+};
+
+// 解封用户
+const unblockUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      return error(res, '用户不存在');
+    }
+
+    await user.update({ is_blocked: 0 });
+
+    return success(res, user, '解封用户成功');
+  } catch (err) {
+    console.error('解封用户失败:', err);
+    return error(res, '解封用户失败');
+  }
+};
+
 module.exports = {
   getUserList,
   updateUserPermission,
-  deleteUser
+  deleteUser,
+  blockUser,
+  unblockUser
 };
