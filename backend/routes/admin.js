@@ -16,6 +16,12 @@ router.put('/users/:id', auth, admin, adminController.updateUserPermission);
 // 删除用户
 router.delete('/users/:id', auth, admin, adminController.deleteUser);
 
+// 拉黑用户
+router.put('/users/:id/block', auth, admin, adminController.blockUser);
+
+// 解封用户
+router.put('/users/:id/unblock', auth, admin, adminController.unblockUser);
+
 // 获取某用户的所有评论
 router.get('/users/:userId/comments', auth, admin, commentController.adminGetUserComments);
 
