@@ -10,6 +10,7 @@ const collectionRoutes = require('./routes/collection');
 const adminRoutes = require('./routes/admin');
 const commentRoutes = require('./routes/comment');
 const configRoutes = require('./routes/config');
+const feedbackRoutes = require('./routes/feedback');
 
 // 导入模型
 const User = require('./models/User');
@@ -18,6 +19,7 @@ const News = require('./models/News');
 const Lecture = require('./models/Lecture');
 const Collection = require('./models/Collection');
 const Comment = require('./models/Comment');
+const Feedback = require('./models/Feedback');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -36,6 +38,7 @@ app.use('/api/collections', collectionRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/config', configRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // 健康检查
 app.get('/api/health', (req, res) => {
